@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+{% block title %}{{title}}{% endblock title %}
+{% block content %}
+<div class="my-5">
+  <div class="container">
+    <div class="row justify-content-center my-md-5" style="border: 1px solid black;">
+      <div class="py-md-3" style="border: 1px solid black;">
+        <h1 style="text-align: center;">Создание персоны</h1>
+      </div>
+        <div class="justify-content-center py-md-5" style="border: 1px solid black;">
+          <form action="{% url 'movies:movie_create' %}" method="post" enctype="multipart/form-data">
+            <div>
+              {% csrf_token %}
+              {{form.as_p}}
+              {{movie_formset}}
+            </div>
+            <button type="submit" class="btn btn-primary">Сохранить</button>
+          </form>
+        </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

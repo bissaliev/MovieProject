@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+{% load thumbnail %}
+{% load movie_tag %}
+{% block title %}{{title}}{% endblock title %}
+{% block content %}
+    <section class="ab-info-main py-md-5 py-4 editContent" style="padding-left: 3rem; padding-right: 3rem;">
+        <div class="container-fluid py-md-3">
+            <div class="row">
+                <div class="side-bar col-lg-3" style="background-color: dimgray;">
+                    {% include 'includes/search_movie.html' %}
+                    <form action="{% url 'movies:filter' %}" method="get">
+                        {% include 'includes/filter_genre.html' %}
+                        {% include 'includes/filter_year.html' %}
+                        {% include 'includes/rating.html' %}
+                        <button type="submit">Найти</button>
+                    </form>
+                    {% get_last_movies count=5 %}
+                </div>
+                <div class="left-ads-display col-lg-9">
+                    Всего фильмов: {{object_list|length}}
+                    <div class="row">
+                        {% for movie in object_list %}
+                        <div class="col-md-4 product-men">
+                            <div class="product-shoe-info editContent text-center mt-lg-4" >
+                                <div class="men-thumb-item">
+                                    {% thumbnail movie.poster "390x450" crop="center" as poster %}
+                                        <img src="{{poster.url}}"alt="" width="{{poster.width}}" height="{{poster.height}}">
+                                    {% endthumbnail %}
+                                </div>
+                                <div class="item-info-product">
+                                    <h4 class="">
+                                        <a href="{{movie.get_absolute_url}}" class="editContent" >{{movie.name}}({{movie.release_year}})</a>
+                                    </h4>
+                                    Рейтинг: {{movie.rating}}
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    <!--<div class="grid-img-right mt-4 text-right bg bg1" >
+                        <span class="money editContent" >Flat 50% Off</span>
+                        <a href="moviesingle.html" class="btn" >Now</a>
+                    </div>-->
+                </div>
+            </div>
+        </div>
+    </section>
+    {% comment %} <script>
+        const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+        checkboxes.forEach(checkbox => {
+            checkbox.addEventListener('click', () => {
+                checkbox.closest('form').submit();
+            });
+        });
+    </script> {% endcomment %}
+{% endblock %}

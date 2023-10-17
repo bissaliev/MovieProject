@@ -1,0 +1,205 @@
+{% extends 'base.html' %}
+{% load thumbnail %}
+{% block title %}Главная страница{% endblock title %}
+{% block content %}
+<div class="left-ads-display py-md-5 py-4 margin-top:10px" style="margin-top:10px">
+    <div class="row">
+        <div class="desc1-left col-md-4">
+            {% thumbnail object.poster "600x800" crop="center" as poster %}
+                <img src="{{poster.url}}" class="img-fluid" alt="">
+            {% endthumbnail %}
+            <p><h3>Рейтинг: {{object.get_average_rating}}</h3></p>
+            {% comment %} <form action="{% url 'movies:add_rating' %}" method="post" name="rating">
+                <div class=" full-stars">
+                    {% csrf_token %}
+                    <input type="hidden" value="{{object.id}}" name="movie">
+                    {% for k, v in ratung_form.fields.score.choices %}
+                    <div class="form-check form-check-inline px-1 mx-1">
+                        <div class="rating-group" style="margin-left: -10px; margin-right: -10px;">
+                            
+                            <label for="rating{{ v }}">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512"><path d="M259.3 17.8L194 150.2 47.9 171.5c-26.2 3.8-36.7 36.1-17.7 54.6l105.7 103-25 145.5c-4.5 26.3 23.2 46 46.4 33.7L288 439.6l130.7 68.7c23.2 12.2 50.9-7.4 46.4-33.7l-25-145.5 105.7-103c19-18.5 8.5-50.8-17.7-54.6L382 150.2 316.7 17.8c-11.7-23.6-45.6-23.9-57.4 0z"/></svg>
+                            </label>
+                            <input id="rating{{ v }}" type="radio" name="score" value="{{ k }}">
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </form> {% endcomment %}
+        </div>
+        <div class="desc1-right col-md-8 pl-lg-4">
+            <h3 class="editContent" style="outline: none; cursor: inherit;">{{object.name}}</h3>
+            <ul>
+                <li style="list-style: none"><span><b>Год:</b> {{object.release_year}} </span></li>
+                <li style="list-style: none"><span><b>Страна:</b> {% for country in object.countries.all %}{{country}},</b>{% endfor %}</span>
+                </li>
+                <li style="list-style: none"><span><b>Слоган:</b> «Welcome to the Day after Judgment Day»</span>
+                </li>
+                <li class="row py-4" style="list-style: none"><b>Режиссер:</b> 
+                    {% for director in object.directors.all %}
+                    <div style="text-align: center; width: 100px; height: 100px; margin-right: 10px;">
+                        <a href="{{director.get_absolute_url}}">
+                            {% thumbnail director.picture "100x100" crop="center" as picture %}
+                            <img src="{{picture.url}}"/>
+                            {% endthumbnail %}
+                            <span style="font-size: small;">{{director}}</span>
+                        </a>
+                    </div>
+                    {% endfor %}
+                </li>
+                <li class="row py-4" style="list-style: none"><b>Актеры:</b> 
+                    {% for actor in object.actors.all %}
+                    <div style="text-align: center; width: 100px; height: 100px; margin-right: 10px;">
+                        <a href="{{actor.get_absolute_url}}">
+                            {% thumbnail actor.picture "100x100" crop="center" as picture %}
+                            <img src="{{picture.url}}"/>
+                            {% endthumbnail %}
+                            <span style="font-size: small;">{{actor}}</span>
+                        </a>
+                    </div>
+                    {% endfor %}
+                </li>
+                <li class="py-4" style="list-style: none">
+                    <span><b>Жанр:</b>
+                        {% for genre in object.genres.all %}
+                            {{genre}},
+                        {% endfor %}
+                    </span>
+                </li>
+                <li style="list-style: none"><span><b>Премьера в мире:</b> 23 октября 2019</span>
+                </li>
+                <li style="list-style: none">
+                    <span><b>Бюджет:</b> $185 000 000</span></li>
+                <li style="list-style: none">
+                    <span><b>Сборы в США:</b> $61 150 256</span></li>
+                <li style="list-style: none"><span><b>Сборы в мире:</b> $250 369 693</span>
+                </li>
+                <li style="list-style: none; padding-left: 10px;">
+                    <div>
+                        <p><h3>Рейтинг: {{object.rating}}</h3></p>
+                        {% comment %} <form action="{% url 'movies:add_rating' %}" method="post" name="rating">
+                            <div class="full-stars">
+                                <div class="rating-group">
+                                    {% csrf_token %}
+                                    <input type="hidden" value="{{object.id}}" name="movie">
+                                    {% for k, v in ratung_form.fields.score.choices %}
+                                        <div class="form-check form-check-inline px-1 mx-1">
+                                            <label for="rating{{ v }}">
+                                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512"><path d="M259.3 17.8L194 150.2 47.9 171.5c-26.2 3.8-36.7 36.1-17.7 54.6l105.7 103-25 145.5c-4.5 26.3 23.2 46 46.4 33.7L288 439.6l130.7 68.7c23.2 12.2 50.9-7.4 46.4-33.7l-25-145.5 105.7-103c19-18.5 8.5-50.8-17.7-54.6L382 150.2 316.7 17.8c-11.7-23.6-45.6-23.9-57.4 0z"/></svg>
+                                            </label>
+                                            <input class="form-check-inline" id="rating{{ v }}" type="radio" name="score" value="{{ k }}">
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </form> {% endcomment %}
+                        <form action="{% url 'movies:add_rating' %}" method="post" name="rating">
+                            {% csrf_token %}
+                            <input type="hidden" value="{{object.id}}" name="movie">
+                            {{rating_form}}
+                        </form>
+                    </div>
+                </li>
+                <li style="list-style: none">
+                    <h3 class="shop-sing editContent" style="outline: none; cursor: inherit;">
+                        О фильме {{object.name }}</h3>
+                    <p class="editContent" style="outline: none; cursor: inherit;">
+                        {{object.description }}
+                    </p>
+                </li>
+            </ul>
+                <div class="share-desc">
+                    <div class="share">
+                        <h4 class="editContent"
+                            style="outline: none; cursor: inherit;">
+                            Share:</h4>
+                        <ul class="w3layouts_social_list list-unstyled">
+                            <li>
+                                <a href="#" class="w3pvt_facebook editContent"
+                                   style="outline: none; cursor: inherit;">
+                                <span class="fa fa-facebook-f"
+                                      style="outline: none; cursor: inherit;"></span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="#" class="w3pvt_twitter editContent"
+                                   style="outline: none; cursor: inherit;">
+                                <span class="fa fa-twitter"
+                                      style="outline: none; cursor: inherit;"></span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="#" class="w3pvt_dribble editContent"
+                                   style="outline: none; cursor: inherit;">
+                                <span class="fa fa-dribbble"
+                                      style="outline: none; cursor: inherit;"></span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="clearfix"></div>
+                </div>
+        </div>
+    </div>
+    {% comment %} <div class="row sub-para-w3layouts mt-5">
+        <p class="mt-3 italic-blue editContent"
+           style="outline: none; cursor: inherit;">
+            <iframe width="560" height="315"
+                    src="https://www.youtube.com/embed/A36LahZNUiE?controls=0"
+                    frameborder="0" allow="accelerometer; autoplay;
+                                                           encrypted-media; gyroscope; picture-in-picture"
+                    allowfullscreen>
+
+            </iframe>
+        </p>
+    </div> {% endcomment %}
+    <hr>
+    {% include 'includes/comments.html' %}
+</div>
+<script>
+    const rating = document.querySelector('form[name=rating]');
+    
+    rating.addEventListener("change", function (e) {
+        // Получаем данные из формы
+        let data = new FormData(this);
+        fetch(`${this.action}`, {
+            method: 'POST',
+            body: data
+        })
+            .then(response => alert("Рейтинг установлен"))
+            .catch(error => alert("Ошибка"))
+    });
+</script>
+{% endblock %}
+{% comment %} {% block content %} {% endcomment %}
+{% comment %} <div class="main-banner bg bg1" id="home" style="background-color: rgba(0, 0, 0, 0); margin-top: 0px; background-image: url(&quot;bundles/single-post-pic.jpg&quot;);"> {% endcomment %}
+    {% comment %} <!-- header --> {% endcomment %}
+    {% comment %} {%include 'includes/header.html' %} {% endcomment %}
+    {% comment %} <!-- //header --> {% endcomment %}
+    {% comment %} <!--/banner--> {% endcomment %}
+    {% comment %} <div class="banner-info"> {% endcomment %}
+        {% comment %} <p class="editContent" >лучший сайт на django 3</p> {% endcomment %}
+        {% comment %} <h3 class="mb-4 editContent">Все о кино</h3> {% endcomment %}
+        {% comment %} <div class="ban-buttons"> {% endcomment %}
+{% comment %}  {% endcomment %}
+{% comment %}  {% endcomment %}
+        {% comment %} </div> {% endcomment %}
+    {% comment %} </div> {% endcomment %}
+    {% comment %} <!--// banner-inner --> {% endcomment %}
+{% comment %}  {% endcomment %}
+{% comment %} </div> {% endcomment %}
+{% comment %} <!--//main-content--> {% endcomment %}
+{% comment %} <!----> {% endcomment %}
+{% comment %} <ol class="breadcrumb editContent"> {% endcomment %}
+    {% comment %} <li class="breadcrumb-item"> {% endcomment %}
+        {% comment %} <a href="index.html" class="editContent">Home</a> {% endcomment %}
+    {% comment %} </li> {% endcomment %}
+    {% comment %} <li class="breadcrumb-item active editContent">Single Page</li> {% endcomment %}
+{% comment %} </ol> {% endcomment %}
+{% comment %} <div> {% endcomment %}
+    {% comment %} {% thumbnail object.poster "400x500" crop="center" as poster %} {% endcomment %}
+        {% comment %} <img src="{{poster.url}}" width="poster.width" height="poster.height"> {% endcomment %}
+    {% comment %} {% endthumbnail %} {% endcomment %}
+    {% comment %} <p>{{object.name}}({{object.release_year}})</p> {% endcomment %}
+{% comment %} </div> {% endcomment %}
+{% comment %} {% endblock %} {% endcomment %}

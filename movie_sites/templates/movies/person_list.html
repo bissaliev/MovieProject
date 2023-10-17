@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+{% load thumbnail %}
+{% load movie_tag %}
+{% block title %}{{title}}{% endblock title %}
+{% block content %}
+        <section class="ab-info-main py-md-5 py-4 editContent" style="padding-left: 3rem; padding-right: 3rem;">
+            <div class="container-fluid py-md-3">
+                <div class="row">
+                    <div class="side-bar col-lg-3">
+                        {% include 'includes/search_movie.html' %}
+                        {% include 'includes/filter_genre.html' %}
+                        {% include 'includes/filter_year.html' %}
+                        {% include 'includes/rating.html' %}
+                        {% get_last_movies count=5 %}
+                    </div>
+                    <div class="left-ads-display col-lg-9">
+                        <div class="row">
+                            {% for obj in object_list %}
+                            <div class="col-md-4 product-men">
+                                <div class="product-shoe-info editContent text-center mt-lg-4" >
+                                    <div class="men-thumb-item">
+                                        {% thumbnail obj.picture "400x400" crop="center" as picture %}
+                                            <img src="{{picture.url}}"alt="" width="{{picture.width}}" height="{{picture.height}}">
+                                        {% endthumbnail %}
+                                    </div>
+                                    <div class="item-info-product">
+                                        <h4 class="">
+                                            <a href="{{obj.get_absolute_url}}" class="editContent" >{{obj.first_name}} {{obj.last_name}}</a>
+                                        </h4>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        <!--<div class="grid-img-right mt-4 text-right bg bg1" >
+                            <span class="money editContent" >Flat 50% Off</span>
+                            <a href="moviesingle.html" class="btn" >Now</a>
+                        </div>-->
+                    </div>
+                </div>
+            </div>
+        </section>
+</body>
+{% endblock %}
+{% comment %} {% extends 'base.html' %} {% endcomment %}
+{% comment %} {% block title %}{{title}}{% endblock title %} {% endcomment %}
+{% comment %} {% block content %} {% endcomment %}
+    {% comment %} {% for obj in object_list %} {% endcomment %}
+        {% comment %} <div> {% endcomment %}
+            {% comment %} {% if obj.picture %} {% endcomment %}
+                {% comment %} <img src="{{obj.picture.url}}" width="300" height="300"> {% endcomment %}
+            {% comment %} {% endif %} {% endcomment %}
+            {% comment %} <p>{{obj.first_name}} {{obj.last_name}} </p> {% endcomment %}
+            {% comment %} <p>{{obj.birthdate}}</p> {% endcomment %}
+            {% comment %} <p><a href="{{obj.get_absolute_url}}">Подробнее</a></p> {% endcomment %}
+        {% comment %} </div> {% endcomment %}
+    {% comment %} {% endfor %} {% endcomment %}
+{% comment %} {% endblock %} {% endcomment %}
+{% comment %}  {% endcomment %}

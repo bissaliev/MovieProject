@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% block title %}{{title}}{% endblock title %}
 {% block content %}
-    <form action="{% url 'movies:actor_create' %}" method="post">
+    <form action="{% url 'movies:category_create' %}" method="post">
       {% csrf_token %}
       {{form.as_p}}
       <button type="submit">Сохранить</button>

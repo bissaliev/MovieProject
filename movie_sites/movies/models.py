@@ -4,17 +4,18 @@ from django.urls import reverse
 from django.utils import timezone
 
 
-GENDER_CHOICES = [("М", "Мужчина"), ("Ж", "Женщина"), ("U", "Unknown")]
-
-
 def get_upload_path(instance, filename):
     """Функция для определения пути изображений."""
     today = timezone.now().strftime("%Y/%m/%d")
     return f"{instance.__class__.__name__}/{today}/{filename}"
 
 
-class AbstractPerson(models.Model):
-    """Абстрактная модель."""
+class Person(models.Model):
+    """Актеры и режиссеры."""
+    M = "М"
+    F = "F"
+    U = "U"
+    GENDER_CHOICES = [(M, "Мужчина"), (F, "Женщина"), (U, "Unknown")]
 
     first_name = models.CharField("Имя", max_length=100)
     last_name = models.CharField("Фамилия", max_length=100, db_index=True)
@@ -30,7 +31,7 @@ class AbstractPerson(models.Model):
     description = models.TextField("Описание", blank=True, null=True)
     picture = models.ImageField(
         "Фото",
-        upload_to=get_upload_path,
+        upload_to="persons/%Y/%m/%d",
         blank=True,
         null=True,
     )
@@ -38,7 +39,7 @@ class AbstractPerson(models.Model):
         "Гендер",
         max_length=1,
         choices=GENDER_CHOICES,
-        default="U",
+        default=U,
     )
     country = models.ForeignKey(
         to="Country",
@@ -50,20 +51,30 @@ class AbstractPerson(models.Model):
     )
 
     class Meta:
-        abstract = True
+        verbose_name = "Персона"
+        verbose_name_plural = "Персоны"
         ordering = ["last_name", "first_name"]
-        # constraints = [
-            # models.UniqueConstraint(
-                # fields=("last_name", "first_name"),
-                # name=f"unique_name_{get_class_name}"
-            # )
-        # ]
+        constraints = [
+            models.UniqueConstraint(
+                fields=("last_name", "first_name"),
+                name="unique_last_first_name"
+            )
+        ]
 
     def __str__(self):
         return f"{self.first_name} {self.last_name}"
-    
-    # def get_class_name(self):
-        # return self.__class__.__name__
+
+    def get_absolute_url(self):
+        return reverse("movies:person_detail", kwargs={"person_id": self.id})
+
+    def get_age(self):
+        today = timezone.now().date()
+        age = today.year - self.birthdate.year
+        - (
+            (today.month, today.day)
+            < (self.birthdate.month, self.birthdate.day)
+        )
+        return age
 
 
 class AbstractCategory(models.Model):
@@ -90,31 +101,6 @@ class Country(AbstractCategory):
         return reverse("movies:country_detail", kwargs={"country_id": self.id})
 
 
-class Actor(AbstractPerson):
-    """Актеры."""
-
-    class Meta(AbstractPerson.Meta):
-        verbose_name = "Актер"
-        verbose_name_plural = "Актеры"
-
-    def get_absolute_url(self):
-        return reverse("movies:actor_detail", kwargs={"actor_id": self.id})
-
-
-class Director(AbstractPerson):
-    """Режиссеры."""
-
-    class Meta(AbstractPerson.Meta):
-        verbose_name = "Режиссер"
-        verbose_name_plural = "Режиссеры"
-
-    def get_absolute_url(self):
-        return reverse(
-            "movies:director_detail",
-            kwargs={"director_id": self.id}
-        )
-
-
 class Category(AbstractCategory):
     """Категории фильмов."""
 
@@ -130,6 +116,7 @@ class Category(AbstractCategory):
 
 class Genre(AbstractCategory):
     """Жанры фильмов."""
+
     slug = models.SlugField("Идентификатор", max_length=100, unique=True)
 
     class Meta(AbstractCategory.Meta):
@@ -137,7 +124,7 @@ class Genre(AbstractCategory):
         verbose_name_plural = "Жанры"
 
     def get_absolute_url(self):
-        return reverse("movies:genre_detail", kwargs={"genre_slug": self.slug})
+        return reverse("movies:genre_detail", kwargs={"slug": self.slug})
 
 
 class Movie(models.Model):
@@ -158,33 +145,148 @@ class Movie(models.Model):
         "Постер", upload_to="movies/%Y/%m/%d", null=True, blank=True
     )
     category = models.ForeignKey(
-        to="Category", on_delete=models.SET_DEFAULT, default="Без категории",
-        null=True, blank=True
+        to="Category",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
     )
     genres = models.ManyToManyField(
-        to="Genre", related_name="genre_movies", verbose_name="Жанры фильма"
+        to="Genre",
+        related_name="genre_movies",
+        verbose_name="Жанры фильма",
+        blank=True
     )
     countries = models.ManyToManyField(
-        to="Country", related_name="country_movies",
-        verbose_name="Страны производства"
+        to="Country",
+        related_name="country_movies",
+        verbose_name="Страны производства",
+        blank=True,
     )
     actors = models.ManyToManyField(
-        to="Actor", related_name="actor_movies",
-        verbose_name="Актеры фильма"
+        to="Person",
+        through="MovieActor",
+        related_name="actor_movies",
+        verbose_name="Актеры фильма",
+        blank=True,
     )
     directors = models.ManyToManyField(
-        to="Director", related_name="director_movies",
-        verbose_name="Режиссеры фильма"
+        to="Person",
+        related_name="director_movies",
+        verbose_name="Режиссеры фильма",
+        blank=True,
     )
     pub_date = models.DateTimeField("Дата публикации", auto_now_add=True)
+    rating = models.FloatField(null=True, blank=True, default=0)
 
     class Meta:
         verbose_name = "Фильм"
         verbose_name_plural = "Фильмы"
-        ordering = ['name', 'release_year']
+        ordering = ["name", "release_year"]
 
     def __str__(self):
         return f"{self.name}({self.release_year})"
 
     def get_absolute_url(self):
-        return reverse("movie_detail", kwargs={"movies:movie_id": self.id})
+        return reverse("movies:movie_detail", kwargs={"movie_id": self.id})
+
+    def get_comments(self):
+        return self.comments.filter(major__isnull=True)
+
+    @property
+    def get_average_rating(self):
+        return self.ratings.aggregate(avg=models.Avg("score")).get("avg")
+
+
+class MovieActor(models.Model):
+    movie = models.ForeignKey(
+        to="Movie",
+        on_delete=models.CASCADE,
+        related_name="movies",
+        verbose_name="Фильм"
+    )
+    actor = models.ForeignKey(
+        to="Person",
+        on_delete=models.CASCADE,
+        related_name="actors",
+        verbose_name="Актер"
+    )
+    role = models.CharField("Роль", max_length=100, null=True, blank=True)
+
+    class Meta:
+        verbose_name = "Фильм-Актер"
+        verbose_name_plural = "Фильмы-Актеры"
+
+    def __str__(self):
+        return f"{self.movie} - {self.actor}"
+
+
+class Rating(models.Model):
+    """Рейтинг."""
+    RATING_CHOICES = [
+        (1, 1),
+        (2, 2),
+        (3, 3),
+        (4, 4),
+        (5, 5),
+        (6, 6),
+        (7, 7),
+        (8, 8),
+        (9, 9),
+        (10, 10),
+    ]
+    movie = models.ForeignKey(
+        to="Movie",
+        on_delete=models.CASCADE,
+        verbose_name="Фильм",
+        related_name="ratings"
+    )
+    score = models.PositiveSmallIntegerField(
+        "Оценка",
+        choices=RATING_CHOICES
+    )
+    ip = models.CharField("IP адрес", max_length=15)
+
+    class Meta:
+        verbose_name = "Рейтинг"
+        verbose_name_plural = "Рейтинги"
+
+    def __str__(self):
+        return f"{self.movie} - {self.score}"
+
+
+class Comment(models.Model):
+    """Комментарии."""
+
+    email = models.EmailField("Email")
+    name = models.CharField("Имя", max_length=100)
+    movie = models.ForeignKey(
+        to="Movie",
+        on_delete=models.CASCADE,
+        related_name="comments",
+        verbose_name="Фильм",
+    )
+    text = models.TextField("Текст комментария")
+    major = models.ForeignKey(
+        to="self",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        verbose_name="Старший комментарий",
+        related_name="majors"
+    )
+    pub_date = models.DateTimeField("Время публикации", auto_now_add=True)
+
+    class Meta:
+        verbose_name = "Комментарий"
+        verbose_name_plural = "Комментарии"
+        ordering = ["-pub_date"]
+
+    def __str__(self):
+        return f"{self.name} - {self.movie}"
+
+    # score = models.PositiveSmallIntegerField(
+    #     "Оценка",
+    #     default=0,
+    #     validators=[MaxValueValidator(10, "Оценка должна быть не более 10.")],
+    #     choices=range(1, 11)
+    # )

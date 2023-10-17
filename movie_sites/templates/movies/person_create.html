@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+{% block title %}{{title}}{% endblock title %}
+{% block content %}
+<div class="my-5">
+  <div class="container">
+    <div class="row justify-content-center my-md-5" style="border: 1px solid black;">
+      <div class="py-md-3" style="border: 1px solid black;">
+        <h1 style="text-align: center;">Создание задачи</h1>
+      </div>
+        <div class="justify-content-center py-md-5" style="border: 1px solid black;">
+          <form action="{% url 'movies:person_create' %}" method="post" enctype="multipart/form-data">
+            <div>
+              {% csrf_token %}
+              {% comment %} {% for field in form %} {% endcomment %}
+                {% comment %} <div class="row my-3" style="display: inline-block;"> {% endcomment %}
+                  {% comment %} <label><h5>{{field.label}}</h5></label>{{ field }} {% endcomment %}
+                {% comment %} </div> {% endcomment %}
+              {% comment %} {% endfor %} {% endcomment %}
+              <div class="my-3 input-form" style="">
+                <label><h5>{{form.first_name.label}}</h5></label>{{ form.first_name }}
+              </div>
+              <div class="my-3" style="">
+                <label><h5>{{form.last_name.label}}</h5></label>{{ form.last_name }}
+              </div>
+              <div class="my-3" style="">
+                <label><h5>{{form.birthdate.label}}</h5></label>{{ form.birthdate }}
+              </div>
+              <div class="my-3 input-form" style="">
+                <label><h5>{{form.description.label}}</h5></label>{{ form.description }}
+              </div>
+              <div class="my-3" style="">
+                <label><h5>{{form.gender.label}}</h5></label>{{ form.gender }}
+              </div>
+              <div class="my-3" style="">
+                <label><h5>{{form.picture.label}}</h5></label>{{ form.picture }}
+              </div>
+              <div class="my-3" style="">
+                <label><h5>{{form.country.label}}</h5></label>{{ form.country }}
+              </div>
+            </div>
+            <button type="submit" class="btn btn-primary">Сохранить</button>
+          </form>
+        </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+{% load thumbnail %}
+{% block title %}Главная страница{% endblock title %}
+{% block content %}
+<div class="left-ads-display py-md-5 py-4">
+    <div class="row py-md-5 py-4">
+        <div class="desc1-left col-md-4">
+            {% thumbnail object.picture "600x800" crop="center" as picture %}
+                <img src="{{picture.url}}" class="img-fluid" alt="">
+            {% endthumbnail %}
+        </div>
+        <div class="desc1-right col-md-8 pl-lg-4">
+            <h3 class="editContent" style="outline: none; cursor: inherit;">
+                {{object.first_name}} {{object.last_name}}
+            </h3>
+            <ul>
+                <li style="list-style: none"><span><b>Дата рождения:</b> {{object.birthdate}} </span></li>
+                <li style="list-style: none"><span><b>Возраст:</b> {{object.get_age}} </span></li>
+                <li style="list-style: none"><span><b>Страна:</b> {{object.country}}</span></li>
+                <li style="list-style: none"><span><b>Пол:</b> {{object.gender}} </span></li>
+                <li style="list-style: none">
+                    <div class="row sub-para-w3layouts mt-5">
+                        <h3 class="shop-sing editContent" style="outline: none; cursor: inherit;">
+                            Об актере {{object.first_name}} {{object.last_name}}
+                        </h3>
+                        <p class="mt-3 editContent" style="outline: none; cursor: inherit;">
+                            {{object.description }}
+                        </p>
+                    </div>
+                </li>
+        </div>
+    </div>
+    <div class="desc1-right row">
+        <h3>Фильмография:</h3>
+            {% for movie in object.actor_movies.all %}
+            <div style="text-align: center; width: 200px;">
+                <a href="{{movie.get_absolute_url}}">
+                    {% thumbnail movie.poster "190x190" crop="center" as poster %}
+                        <img src="{{poster.url}}" class="img-fluid" alt="">
+                    {% endthumbnail %}
+                </a><br>
+                <span style="font-size: small;">{{movie.name}}</span>
+                {{movie.role}}
+            </div>
+            {% endfor %}
+            {% for movie in object.director_movies.all %}
+            <div style="text-align: center; width: 200px;">
+                <a href="{{movie.get_absolute_url}}">
+                    {% thumbnail movie.poster "190x190" crop="center" as poster %}
+                        <img src="{{poster.url}}" class="img-fluid" alt="">
+                    {% endthumbnail %}
+                </a><br>
+                <span style="font-size: small;">{{movie.name}}</span>
+            </div>
+            {% endfor %}
+    </div>
+    </div>
+</div>
+{% endblock %}
