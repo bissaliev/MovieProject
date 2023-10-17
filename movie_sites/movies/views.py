@@ -122,19 +122,24 @@ class FilterMovieView(GenreYear, ListView):
     template_name = "movies/movies.html"
 
     def get_queryset(self):
+        query_filter = []
+        queryset = Movie.objects.all().order_by()
         rating = self.request.GET.get("rating")
-        if not rating:
-            rating = 0
-        queryset = Movie.objects.filter(
-            Q(Q(release_year__in=self.request.GET.getlist("release_year")) |
-            Q(genres__in=self.request.GET.getlist("genre"))) &
-            Q(rating__gte=rating)
-        ).distinct()
-        # if self.request.GET.get("rating"):
-        #     if queryset:
-        #         queryset = queryset.filter(rating__gte=self.request.GET.get("rating"))
-        #     else:
-        #         queryset = Movie.objects.filter(rating__gte=self.request.GET.get("rating"))
+        genres = self.request.GET.getlist("genre")
+        release_year = self.request.GET.getlist("release_year")
+        if rating:
+            query_filter.append(
+                Movie.objects.filter(rating__gte=rating).order_by()
+            )
+        if genres:
+            query_filter.append(
+                Movie.objects.filter(genres__in=genres).order_by()
+            )
+        if release_year:
+            query_filter.append(
+                Movie.objects.filter(release_year__in=release_year).order_by()
+            )
+        queryset = queryset.intersection(*query_filter)
         return queryset
 
 
