@@ -13,7 +13,9 @@ from .forms import (
     MovieForm,
     CommentForm,
     RatingForm,
-    MovieFormSet
+    MovieFormSet,
+    SortMovieForm,
+    GenreMovieForm
 )
 from django.views.generic import ListView, CreateView, DetailView
 from django.urls import reverse_lazy
@@ -120,9 +122,23 @@ class OrderingView:
 
     def get_queryset(self) -> QuerySet[Any]:
         queryset = super().get_queryset()
-        sort = self.request.GET.getlist("sort")
+        sort = []
+        name = self.request.GET.get("name")
+        release_year = self.request.GET.get("release_year")
+        rating = self.request.GET.get("rating")
+        if name:
+            sort.append(name)
+        if release_year:
+            sort.append(release_year)
+        if rating:
+            sort.append(rating)
         queryset = queryset.order_by(*sort)
         return queryset
+
+    def get_context_data(self, **kwargs) -> dict[str, Any]:
+        context = super().get_context_data(**kwargs)
+        context["form_ordering"] = SortMovieForm()
+        return context
 
 
 class FilterMovieView(GenreYear, ListView):
@@ -261,17 +277,23 @@ class CountryCreateView(CreateView):
     extra_context = {"title": "Создание новой страны"}
 
 
-class MovieListView(GenreYear, OrderingView, ListView):
+class MovieListView(GenreYear, ListView):
     """Список фильмов."""
     model = Movie
     template_name = "movies/movies.html"
     extra_context = {"title": "Фильмы"}
 
+    def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
+        context = super().get_context_data(**kwargs)
+        context["genre_form"] = GenreMovieForm()
+        return context
 
-    # def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
-    #     context = super().get_context_data(**kwargs)
-    #     context["categories"] = Category.objects.all()
-    #     return context
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        if self.request.GET:
+            genres = self.request.GET.getlist("genres")
+            queryset = queryset.filter(genres__id__in=genres).distinct()
+        return queryset
 
 
 class MovieDetailView(DetailView):
