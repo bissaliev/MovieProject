@@ -12,12 +12,39 @@
                         {% include 'includes/filter_genre.html' %}
                         {% include 'includes/filter_year.html' %}
                         {% include 'includes/rating.html' %}
-                        <button type="submit">Найти</button>
+                        <button type="submit" class="btn btn-sm btn-primary btn-raised mr-3">Найти</button>
                     </form>
                     {% get_last_movies count=5 %}
                 </div>
                 <div class="left-ads-display col-lg-9">
                     Всего фильмов: {{object_list|length}}
+                    {% comment %} <form method="get">
+                        <button type="submit" class="btn btn-sm btn-primary btn-raised mr-3">Сортировать</button>
+                        <input name="sort" type="checkbox" value="name">по заголовку А-Я
+                        <input name="sort" type="checkbox" value="-name">по заголовку Я-А
+                        <input name="sort" type="checkbox" value="release_year">по годам на возростание
+                        <input name="sort" type="checkbox" value="-release_year">по годам на убывание
+                        <input name="sort" type="checkbox" value="rating">по рейтингам на возростание
+                        <input name="sort" type="checkbox" value="-rating">по рейтингам на убывание
+                    </form> {% endcomment %}
+                    <form method="get">
+                        <button type="submit" class="btn btn-sm btn-primary btn-raised mr-3">Сортировать</button>
+                        <label for="id_name">По заголовку</label>
+                        <select name="sort">
+                            <option value="name">А-Я</option>
+                            <option value="-name">Я-А</option>
+                        </select>
+                        <label for="id_release_year">По годам</label>
+                        <select name="sort">
+                            <option value="release_year">на возростание</option>
+                            <option value="-release_year">На убывание</option>
+                        </select>
+                        <label for="id_rating">По рейтингу</label>
+                        <select name="sort">
+                            <option value="rating">на возростание</option>
+                            <option value="-rating">На убывание</option>
+                        </select>
+                    </form>
                     <div class="row">
                         {% for movie in object_list %}
                         <div class="col-md-4 product-men">

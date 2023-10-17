@@ -1,5 +1,7 @@
+from typing import Any
 from django.db.models import Q
 from django.db.models import Count, Avg
+from django.db.models.query import QuerySet
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect
 from .models import Person, Category, Genre, Country, Movie, Rating
@@ -113,12 +115,18 @@ class GenreYear:
     def get_ratings(self):
         return range(1, 11)
 
-    # def get_ratings(self):
-    #     return Rating.objects.values("movie").annotate(avr_rating=Avg("score"))
+
+class OrderingView:
+
+    def get_queryset(self) -> QuerySet[Any]:
+        queryset = super().get_queryset()
+        sort = self.request.GET.getlist("sort")
+        queryset = queryset.order_by(*sort)
+        return queryset
 
 
 class FilterMovieView(GenreYear, ListView):
-    """Фильтрация фильмов по жанрам и годам."""
+    """Фильтрация фильмов по жанрам, годам и рейтингам."""
     template_name = "movies/movies.html"
 
     def get_queryset(self):
@@ -253,11 +261,12 @@ class CountryCreateView(CreateView):
     extra_context = {"title": "Создание новой страны"}
 
 
-class MovieListView(GenreYear, ListView):
+class MovieListView(GenreYear, OrderingView, ListView):
     """Список фильмов."""
     model = Movie
     template_name = "movies/movies.html"
     extra_context = {"title": "Фильмы"}
+
 
     # def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
     #     context = super().get_context_data(**kwargs)
