@@ -8,9 +8,35 @@
             <div class="row">
                 <div class="side-bar col-lg-3" style="background-color: dimgray;">
                     {% include 'includes/search_movie.html' %}
-                    <form method="get">
+                    <form method="get" name="filter">
                         <div class="form-group">
-                            {{filter_form}}
+                            {% comment %} <button type="submit" class="btn btn-sm btn-primary btn-raised mr-3">Сортировать</button> {% endcomment %}
+                            {% comment %} {{form_ordering}} {% endcomment %}
+                            <button type="submit" class="btn btn-sm btn-primary btn-raised m-3">Сортировать</button>
+                            <p>
+                                {{filter_form.name.label}}
+                                {{filter_form.name}}
+                            </p>
+                            <p>
+                                {{filter_form.release_year.label}}
+                                {{filter_form.release_year}}
+                            </p>
+                            <p>
+                                {{filter_form.rating.label}}
+                                {{filter_form.rating}}
+                            </p>
+                            <p>
+                                {{filter_form.filter_genres.label}}
+                                {{filter_form.filter_genres}}
+                            </p>
+                            <p>
+                                {{filter_form.filter_years.label}}
+                                {{filter_form.filter_years}}
+                            </p>
+                            <p>
+                                {{filter_form.filter_rating.label}}
+                                {{filter_form.filter_rating}}
+                            </p>
                         </div>
                         <button type="submit" class="btn btn-sm btn-primary btn-raised mr-3">Найти</button>
                     </form>
@@ -28,9 +54,11 @@
                 </div>
                 <div class="left-ads-display col-lg-9">
                     Всего фильмов: {{object_list|length}}
-                    <form method="get">
-                        <button type="submit" class="btn btn-sm btn-primary btn-raised mr-3">Сортировать</button>
-                        {{form_ordering}}
+                    <form method="get" name="filter">
+                        {% comment %} <button type="submit" class="btn btn-sm btn-primary btn-raised mr-3">Сортировать</button>
+                        {{filter_form.name}}
+                        {{filter_form.release_year}}
+                        {{filter_form.rating}} {% endcomment %}
                     </form>
                     <div class="row">
                         {% for movie in object_list %}

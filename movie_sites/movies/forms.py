@@ -123,6 +123,30 @@ class FilterMovieForm(forms.Form):
             Movie.objects.values_list("release_year", flat=True)
         )
     ]
+    NAME_SORT_CHOICES = (
+        (None, "не выбрано"),
+        ("name", "А-Я"),
+        ("-name", "Я-А")
+    )
+    YEAR_SORT_CHOICES = (
+        (None, "не выбрано"),
+        ("release_year", "На возрастание"),
+        ("-release_year", "На убывание")
+    )
+    RATING_SORT_CHOICES = (
+        (None, "не выбрано"),
+        ("rating", "На возрастание"),
+        ("-rating", "На убывание")
+    )
+    name = forms.ChoiceField(
+        choices=NAME_SORT_CHOICES, label="По заголовку", required=False
+    )
+    release_year = forms.ChoiceField(
+        choices=YEAR_SORT_CHOICES, label="По годам", required=False
+    )
+    rating = forms.ChoiceField(
+        choices=RATING_SORT_CHOICES, label="По рейтингу", required=False
+    )
     filter_genres = forms.ModelChoiceField(
         queryset=Genre.objects.all(), widget=forms.CheckboxSelectMultiple,
         label="Жанры"
@@ -137,7 +161,7 @@ class FilterMovieForm(forms.Form):
     )
 
     class Meta:
-        fields = ("genres", "years", "rating")
+        fields = ("name", "release_year", "rating", "genres", "years", "rating")
 
 
 MovieFormSet = forms.inlineformset_factory(

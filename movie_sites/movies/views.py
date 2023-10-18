@@ -244,7 +244,8 @@ class MovieListView(ListView):
 
     def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
         context = super().get_context_data(**kwargs)
-        context["filter_form"] = FilterMovieForm()
+        context["filter_form"] = FilterMovieForm(self.request.GET)
+        # context["form_ordering"] = SortMovieForm()
         return context
 
     def get_queryset(self):
@@ -260,6 +261,17 @@ class MovieListView(ListView):
         if filter_years:
             query_filter.append(queryset.filter(release_year__in=filter_years))
         queryset = queryset.intersection(*query_filter)
+        sort = []
+        name = self.request.GET.get("name")
+        release_year = self.request.GET.get("release_year")
+        rating = self.request.GET.get("rating")
+        if name:
+            sort.append(name)
+        if release_year:
+            sort.append(release_year)
+        if rating:
+            sort.append(rating)
+        queryset = queryset.order_by(*sort)
         return queryset
 
 
