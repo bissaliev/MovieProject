@@ -1,9 +1,8 @@
 from typing import Any
-from django.db.models import Q
-from django.db.models import Count, Avg
+from django.db.models import Avg
 from django.db.models.query import QuerySet
 from django.http import HttpResponse
-from django.shortcuts import get_object_or_404, redirect
+from django.shortcuts import redirect
 from .models import Person, Category, Genre, Country, Movie, Rating
 from .forms import (
     PersonForm,
@@ -15,7 +14,7 @@ from .forms import (
     RatingForm,
     MovieFormSet,
     SortMovieForm,
-    GenreMovieForm
+    FilterMovieForm
 )
 from django.views.generic import ListView, CreateView, DetailView
 from django.urls import reverse_lazy
@@ -104,20 +103,6 @@ class AddComment(View):
         return redirect(movie.get_absolute_url())
 
 
-class GenreYear:
-    """Класс миксин для фильтрации фильмов по жанрам и годам."""
-    def get_genres(self):
-        return Genre.objects.all()
-
-    def get_years(self):
-        return Movie.objects.all().values(
-            'release_year'
-        ).annotate(Count('release_year'))
-
-    def get_ratings(self):
-        return range(1, 11)
-
-
 class OrderingView:
 
     def get_queryset(self) -> QuerySet[Any]:
@@ -139,32 +124,6 @@ class OrderingView:
         context = super().get_context_data(**kwargs)
         context["form_ordering"] = SortMovieForm()
         return context
-
-
-class FilterMovieView(GenreYear, ListView):
-    """Фильтрация фильмов по жанрам, годам и рейтингам."""
-    template_name = "movies/movies.html"
-
-    def get_queryset(self):
-        query_filter = []
-        queryset = Movie.objects.all().order_by()
-        rating = self.request.GET.get("rating")
-        genres = self.request.GET.getlist("genre")
-        release_year = self.request.GET.getlist("release_year")
-        if rating:
-            query_filter.append(
-                Movie.objects.filter(rating__gte=rating).order_by()
-            )
-        if genres:
-            query_filter.append(
-                Movie.objects.filter(genres__in=genres).order_by()
-            )
-        if release_year:
-            query_filter.append(
-                Movie.objects.filter(release_year__in=release_year).order_by()
-            )
-        queryset = queryset.intersection(*query_filter)
-        return queryset
 
 
 class SearchMovie(ListView):
@@ -277,7 +236,7 @@ class CountryCreateView(CreateView):
     extra_context = {"title": "Создание новой страны"}
 
 
-class MovieListView(GenreYear, ListView):
+class MovieListView(ListView):
     """Список фильмов."""
     model = Movie
     template_name = "movies/movies.html"
@@ -285,14 +244,22 @@ class MovieListView(GenreYear, ListView):
 
     def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
         context = super().get_context_data(**kwargs)
-        context["genre_form"] = GenreMovieForm()
+        context["filter_form"] = FilterMovieForm()
         return context
 
     def get_queryset(self):
-        queryset = super().get_queryset()
-        if self.request.GET:
-            genres = self.request.GET.getlist("genres")
-            queryset = queryset.filter(genres__id__in=genres).distinct()
+        queryset = super().get_queryset().order_by()
+        query_filter = []
+        filter_genres = self.request.GET.getlist("filter_genres")
+        filter_rating = self.request.GET.get("filter_rating")
+        filter_years = self.request.GET.getlist("filter_years")
+        if filter_genres:
+            query_filter.append(queryset.filter(genres__id__in=filter_genres))
+        if filter_rating:
+            query_filter.append(queryset.filter(rating__gte=filter_rating))
+        if filter_years:
+            query_filter.append(queryset.filter(release_year__in=filter_years))
+        queryset = queryset.intersection(*query_filter)
         return queryset
 
 

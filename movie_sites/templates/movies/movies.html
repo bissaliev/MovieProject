@@ -9,9 +9,15 @@
                 <div class="side-bar col-lg-3" style="background-color: dimgray;">
                     {% include 'includes/search_movie.html' %}
                     <form method="get">
-                        {{genre_form}}
+                        <div class="form-group">
+                            {{filter_form}}
+                        </div>
                         <button type="submit" class="btn btn-sm btn-primary btn-raised mr-3">Найти</button>
                     </form>
+                    {% comment %} <form method="get"> {% endcomment %}
+                        {% comment %} {{rating_form}} {% endcomment %}
+                        {% comment %} <button type="submit" class="btn btn-sm btn-primary btn-raised mr-3">Найти</button> {% endcomment %}
+                    {% comment %} </form> {% endcomment %}
                     {% comment %} <form action="{% url 'movies:filter' %}" method="get"> {% endcomment %}
                         {% comment %} {% include 'includes/filter_genre.html' %} {% endcomment %}
                         {% comment %} {% include 'includes/filter_year.html' %} {% endcomment %}

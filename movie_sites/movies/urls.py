@@ -15,7 +15,6 @@ from .views import (
     MovieListView,
     MovieDetailView,
     MovieCreateView,
-    FilterMovieView,
     SearchMovie,
     AddComment,
     AddRating
@@ -26,7 +25,6 @@ app_name = "movies"
 
 urlpatterns = [
     path("", MovieListView.as_view(), name="index"),
-    path("filter/", FilterMovieView.as_view(), name="filter"),
     path("search/", SearchMovie.as_view(), name="search"),
     path(
         "movie/<int:movie_id>/",

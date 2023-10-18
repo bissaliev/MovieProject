@@ -10,6 +10,8 @@ from .models import (
     Rating
 )
 
+from django.db.models import Count
+
 
 class CommentForm(forms.ModelForm):
     """Форма комментариев."""
@@ -115,12 +117,27 @@ class SortMovieForm(forms.Form):
         fields = ("name", "release_year", "rating")
 
 
-class GenreMovieForm(forms.Form):
-    genres = forms.ModelChoiceField(queryset=Genre.objects.all(), widget=forms.CheckboxSelectMultiple)
-    # genres = forms.ModelMultipleChoiceField(queryset=Genre.objects.all(), widget=forms.ChoiceField(), to_field_name="pk")
+class FilterMovieForm(forms.Form):
+    CHOICE_YEARS = [
+        (i, i) for i in set(
+            Movie.objects.values_list("release_year", flat=True)
+        )
+    ]
+    filter_genres = forms.ModelChoiceField(
+        queryset=Genre.objects.all(), widget=forms.CheckboxSelectMultiple,
+        label="Жанры"
+    )
+    filter_years = forms.MultipleChoiceField(
+        choices=CHOICE_YEARS, widget=forms.CheckboxSelectMultiple,
+        label="Года"
+    )
+    filter_rating = forms.MultipleChoiceField(
+        choices=Rating.RATING_CHOICES, widget=forms.CheckboxSelectMultiple,
+        label="Рейтинг"
+    )
 
     class Meta:
-        fields = ("genres",)
+        fields = ("genres", "years", "rating")
 
 
 MovieFormSet = forms.inlineformset_factory(
