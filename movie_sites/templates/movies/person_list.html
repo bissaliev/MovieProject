@@ -6,11 +6,25 @@
         <section class="ab-info-main py-md-5 py-4 editContent" style="padding-left: 3rem; padding-right: 3rem;">
             <div class="container-fluid py-md-3">
                 <div class="row">
-                    <div class="side-bar col-lg-3">
-                        {% include 'includes/search_movie.html' %}
-                        {% include 'includes/filter_genre.html' %}
-                        {% include 'includes/filter_year.html' %}
-                        {% include 'includes/rating.html' %}
+                    <div class="col-lg-3">
+                        <div class="w3layouts-newsletter m-3">
+                            <h3 class="sear-head editContent" >Поиск актера</h3>
+                            <form action="{% url 'movies:search_person' %}" method="get" class="d-flex editContent" >
+                                <input type="search" placeholder="Введите имя актера..." name="search" class="form-control" required="">
+                                <button class="btn1 btn" ><span class="fa fa-search" aria-hidden="true" ></span></button>
+                            </form>
+                        </div>
+                        <form action="{% url 'movies:person_category' %}" method="get">
+                            <p>
+                                {{category_form.profile.label}}
+                                {{category_form.profile}}
+                            </p>
+                            <p>
+                                {{category_form.gender.label}}
+                                {{category_form.gender}}
+                            </p>
+                            <button type="submit" class="btn btn-sm btn-primary btn-raised m-3">Сортировать</button>
+                        </form>
                         {% get_last_movies count=5 %}
                     </div>
                     <div class="left-ads-display col-lg-9">

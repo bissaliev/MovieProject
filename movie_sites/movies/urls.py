@@ -17,7 +17,9 @@ from .views import (
     MovieCreateView,
     SearchMovie,
     AddComment,
-    AddRating
+    AddRating,
+    SearchPerson,
+    PersonCategoryView
 )
 
 
@@ -26,6 +28,7 @@ app_name = "movies"
 urlpatterns = [
     path("", MovieListView.as_view(), name="index"),
     path("search/", SearchMovie.as_view(), name="search"),
+    path("search_person/", SearchPerson.as_view(), name="search_person"),
     path(
         "movie/<int:movie_id>/",
         MovieDetailView.as_view(),
@@ -33,6 +36,7 @@ urlpatterns = [
     ),
     path("movie/create/", MovieCreateView.as_view(), name="movie_create"),
     path("persons/", PersonListView.as_view(), name="persons"),
+    path("person_cat/", PersonCategoryView.as_view(), name="person_category"),
     path("person/create/", PersonCreateView.as_view(), name="person_create"),
     path(
         "person/<int:person_id>/",

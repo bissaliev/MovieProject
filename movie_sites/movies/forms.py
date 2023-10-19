@@ -10,8 +10,6 @@ from .models import (
     Rating
 )
 
-from django.db.models import Count
-
 
 class CommentForm(forms.ModelForm):
     """Форма комментариев."""
@@ -65,56 +63,10 @@ class MovieActorForm(forms.ModelForm):
 
 
 class RatingForm(forms.ModelForm):
-    # CHOICES = [
-    #     (1, 1),
-    #     (2, 2),
-    #     (3, 3),
-    #     (4, 4),
-    #     (5, 5),
-    #     (6, 6),
-    #     (7, 7),
-    #     (8, 8),
-    #     (9, 9),
-    #     (10, 10),
-    # ]
-    # score = forms.ChoiceField(
-    #     widget=forms.RadioSelect(), choices=Rating.RATING_CHOICES
-    # )
 
     class Meta:
         model = Rating
         fields = ("score",)
-
-
-class SortMovieForm(forms.Form):
-    NAME_SORT_CHOICES = (
-        (None, "не выбрано"),
-        ("name", "А-Я"),
-        ("-name", "Я-А")
-    )
-    YEAR_SORT_CHOICES = (
-        (None, "не выбрано"),
-        ("release_year", "На возрастание"),
-        ("-release_year", "На убывание")
-    )
-    RATING_SORT_CHOICES = (
-        (None, "не выбрано"),
-        ("rating", "На возрастание"),
-        ("-rating", "На убывание")
-    )
-
-    name = forms.ChoiceField(
-        choices=NAME_SORT_CHOICES, label="По заголовку", required=False
-    )
-    release_year = forms.ChoiceField(
-        choices=YEAR_SORT_CHOICES, label="По годам", required=False
-    )
-    rating = forms.ChoiceField(
-        choices=RATING_SORT_CHOICES, label="По рейтингу", required=False
-    )
-
-    class Meta:
-        fields = ("name", "release_year", "rating")
 
 
 class FilterMovieForm(forms.Form):
@@ -161,9 +113,29 @@ class FilterMovieForm(forms.Form):
     )
 
     class Meta:
-        fields = ("name", "release_year", "rating", "genres", "years", "rating")
+        fields = (
+            "name", "release_year", "rating", "genres", "years", "rating"
+        )
 
 
 MovieFormSet = forms.inlineformset_factory(
     Movie, MovieActor, form=MovieActorForm
 )
+
+
+class ActorDirectorForm(forms.Form):
+    CHOICE_PERSON_PROFILE = [
+        ("actors", "Актеры"),
+        ("directors", "Режиссеры"),
+    ]
+    profile = forms.ChoiceField(
+        choices=CHOICE_PERSON_PROFILE,
+        label="Категория",
+        widget=forms.CheckboxSelectMultiple
+    )
+    gender = forms.ChoiceField(
+        choices=Person.GENDER_CHOICES,
+        label="Пол",
+        widget=forms.CheckboxSelectMultiple,
+        required=False
+    )

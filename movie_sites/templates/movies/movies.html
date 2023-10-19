@@ -54,12 +54,12 @@
                 </div>
                 <div class="left-ads-display col-lg-9">
                     Всего фильмов: {{object_list|length}}
-                    <form method="get" name="filter">
+                    {% comment %} <form method="get" name="filter"> {% endcomment %}
                         {% comment %} <button type="submit" class="btn btn-sm btn-primary btn-raised mr-3">Сортировать</button>
                         {{filter_form.name}}
                         {{filter_form.release_year}}
                         {{filter_form.rating}} {% endcomment %}
-                    </form>
+                    {% comment %} </form> {% endcomment %}
                     <div class="row">
                         {% for movie in object_list %}
                         <div class="col-md-4 product-men">

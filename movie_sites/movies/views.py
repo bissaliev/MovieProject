@@ -1,9 +1,9 @@
 from typing import Any
-from django.db.models import Avg
+from django.db.models import Avg, Q
 from django.db.models.query import QuerySet
 from django.http import HttpResponse
 from django.shortcuts import redirect
-from .models import Person, Category, Genre, Country, Movie, Rating
+from .models import Person, Category, Genre, Country, Movie, Rating, MovieActor
 from .forms import (
     PersonForm,
     CategoryForm,
@@ -13,40 +13,14 @@ from .forms import (
     CommentForm,
     RatingForm,
     MovieFormSet,
-    SortMovieForm,
-    FilterMovieForm
+    FilterMovieForm,
+    ActorDirectorForm
 )
+from .utils import get_ip
 from django.views.generic import ListView, CreateView, DetailView
 from django.urls import reverse_lazy
 # from django.views.generic.base import View
 from django.views import View
-
-
-def get_ip(request):
-    x_forwarded_for = request.META.get("HTTP_X_FORWARDED_FOR")
-    if x_forwarded_for:
-        ip = x_forwarded_for.split(",")[0]
-    else:
-        ip = request.META.get("REMOTE_ADDR")
-    return ip
-
-
-class AddRating(View):
-    """Добавление рейтинга."""
-
-    def post(self, request):
-        form = RatingForm(request.POST)
-        if form.is_valid():
-            rating, _ = Rating.objects.update_or_create(
-                movie_id=int(request.POST.get("movie")),
-                ip=get_ip(request),
-                defaults={"score": request.POST.get("score")}
-            )
-            avg_rating = rating.movie.ratings.values("movie").annotate(avg=Avg("score"))[0].get("avg")
-            rating.movie.rating = avg_rating
-            rating.movie.save()
-            return redirect("movies:movie_detail", request.POST.get("movie"))  # HttpResponse(status=201)
-        return HttpResponse(status=400)
 
 
 class MovieCreateView(CreateView):
@@ -88,44 +62,6 @@ class MovieCreateView(CreateView):
         )
 
 
-class AddComment(View):
-    """Добавление комментариев."""
-
-    def post(self, request, pk):
-        form = CommentForm(request.POST)
-        movie = Movie.objects.get(id=pk)
-        if form.is_valid():
-            form = form.save(commit=False)
-            if request.POST.get("major", None):
-                form.major_id = int(request.POST.get("major"))
-            form.movie = movie
-            form.save()
-        return redirect(movie.get_absolute_url())
-
-
-class OrderingView:
-
-    def get_queryset(self) -> QuerySet[Any]:
-        queryset = super().get_queryset()
-        sort = []
-        name = self.request.GET.get("name")
-        release_year = self.request.GET.get("release_year")
-        rating = self.request.GET.get("rating")
-        if name:
-            sort.append(name)
-        if release_year:
-            sort.append(release_year)
-        if rating:
-            sort.append(rating)
-        queryset = queryset.order_by(*sort)
-        return queryset
-
-    def get_context_data(self, **kwargs) -> dict[str, Any]:
-        context = super().get_context_data(**kwargs)
-        context["form_ordering"] = SortMovieForm()
-        return context
-
-
 class SearchMovie(ListView):
     """Поиск фильмов по названию."""
     template_name = "movies/movies.html"
@@ -141,11 +77,48 @@ class SearchMovie(ListView):
         return context
 
 
+class SearchPerson(SearchMovie):
+    template_name = "movies/person_list.html"
+
+    def get_queryset(self):
+        search = self.request.GET.get("search")
+        return Person.objects.filter(
+            Q(first_name__icontains=search) |
+            Q(last_name__icontains=search)
+        )
+
+
+class PersonCategoryView(ListView):
+    template_name = "movies/person_list.html"
+
+    def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
+        context = super().get_context_data(**kwargs)
+        context["category_form"] = ActorDirectorForm(self.request.GET)
+        return context
+
+    def get_queryset(self) -> QuerySet[Any]:
+        queryset = Person.objects.all()
+        actor_ids = MovieActor.objects.values_list("actor_id", flat=True)
+        if self.request.GET.get("profile"):
+            if self.request.GET.get("profile") == "actors":
+                queryset = queryset.filter(id__in=actor_ids)
+            else:
+                queryset = queryset.exclude(id__in=actor_ids)
+        if self.request.GET.get("gender"):
+            return queryset.filter(gender=self.request.GET.get("gender"))
+        return queryset
+
+
 class PersonListView(ListView):
     """Список персон."""
     model = Person
     template_name = "movies/person_list.html"
-    extra_context = {"title": "Актеры"}
+    extra_context = {"title": "Персоны"}
+
+    def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
+        context = super().get_context_data(**kwargs)
+        context["category_form"] = ActorDirectorForm()
+        return context
 
 
 class PersonCreateView(CreateView):
@@ -162,78 +135,6 @@ class PersonDetailView(DetailView):
     template_name = "movies/person_detail.html"
     extra_context = {"title": "Детальная информация"}
     pk_url_kwarg = "person_id"
-
-
-class CategoryListView(ListView):
-    """Список категорий."""
-    model = Category
-    template_name = "movies/category_list.html"
-    extra_context = {"title": "Категории"}
-
-
-class CategoryDetailView(DetailView):
-    """категория."""
-    model = Category
-    template_name = "movies/category_detail.html"  # "movies/movies.html"
-    extra_context = {"title": "Категория"}
-
-    # def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
-    #     context = super().get_context_data(**kwargs)
-    #     context["object_list"] = context["object"].movie_set.all()
-    #     return context
-
-
-class CategoryCreateView(CreateView):
-    """Создание категории."""
-    form_class = CategoryForm
-    template_name = "movies/category_create.html"
-    success_url = reverse_lazy("movies:category_list")
-    extra_context = {"title": "Создание новой категории"}
-
-
-class GenreListView(ListView):
-    """Список жанров."""
-    model = Genre
-    template_name = "movies/category_list.html"
-    extra_context = {"title": "Жанры"}
-
-
-class GenreDetailView(DetailView):
-    """Жанр."""
-    model = Genre
-    template_name = "movies/category_detail.html"
-    extra_context = {"title": "Жанр"}
-
-
-class GenreCreateView(CreateView):
-    """Создание жанра."""
-    form_class = GenreForm
-    template_name = "movies/category_create.html"
-    success_url = reverse_lazy("movies:genre_list")
-    extra_context = {"title": "Создание нового жанра"}
-
-
-class CountryListView(ListView):
-    """Список стран."""
-    model = Country
-    template_name = "movies/category_list.html"
-    extra_context = {"title": "Страны"}
-
-
-class CountryDetailView(DetailView):
-    """Страна."""
-    model = Country
-    template_name = "movies/category_detail.html"
-    extra_context = {"title": "Страна"}
-    pk_url_kwarg = "country_id"
-
-
-class CountryCreateView(CreateView):
-    """Создание страны."""
-    form_class = CountryForm
-    template_name = "movies/country_create.html"
-    success_url = reverse_lazy("movies:country_list")
-    extra_context = {"title": "Создание новой страны"}
 
 
 class MovieListView(ListView):
@@ -291,3 +192,110 @@ class MovieDetailView(DetailView):
             context["rating_form"] = RatingForm()
         context["form"] = CommentForm()
         return context
+
+
+class AddComment(View):
+    """Добавление комментариев."""
+
+    def post(self, request, pk):
+        form = CommentForm(request.POST)
+        movie = Movie.objects.get(id=pk)
+        if form.is_valid():
+            form = form.save(commit=False)
+            if request.POST.get("major", None):
+                form.major_id = int(request.POST.get("major"))
+            form.movie = movie
+            form.save()
+        return redirect(movie.get_absolute_url())
+
+
+class AddRating(View):
+    """Добавление рейтинга."""
+
+    def post(self, request):
+        form = RatingForm(request.POST)
+        if form.is_valid():
+            rating, _ = Rating.objects.update_or_create(
+                movie_id=int(request.POST.get("movie")),
+                ip=get_ip(request),
+                defaults={"score": request.POST.get("score")}
+            )
+            avg_rating = rating.movie.ratings.values(
+                "movie"
+            ).annotate(avg=Avg("score"))[0].get("avg")
+            rating.movie.rating = avg_rating
+            rating.movie.save()
+            return redirect("movies:movie_detail", request.POST.get("movie"))
+        return HttpResponse(status=400)
+
+
+class CountryListView(ListView):
+    """Список стран."""
+    model = Country
+    template_name = "movies/category_list.html"
+    extra_context = {"title": "Страны"}
+
+
+class CountryDetailView(DetailView):
+    """Страна."""
+    model = Country
+    template_name = "movies/category_detail.html"
+    extra_context = {"title": "Страна"}
+    pk_url_kwarg = "country_id"
+
+
+class CountryCreateView(CreateView):
+    """Создание страны."""
+    form_class = CountryForm
+    template_name = "movies/country_create.html"
+    success_url = reverse_lazy("movies:country_list")
+    extra_context = {"title": "Создание новой страны"}
+
+
+class GenreListView(ListView):
+    """Список жанров."""
+    model = Genre
+    template_name = "movies/category_list.html"
+    extra_context = {"title": "Жанры"}
+
+
+class GenreDetailView(DetailView):
+    """Жанр."""
+    model = Genre
+    template_name = "movies/category_detail.html"
+    extra_context = {"title": "Жанр"}
+
+
+class GenreCreateView(CreateView):
+    """Создание жанра."""
+    form_class = GenreForm
+    template_name = "movies/category_create.html"
+    success_url = reverse_lazy("movies:genre_list")
+    extra_context = {"title": "Создание нового жанра"}
+
+
+class CategoryListView(ListView):
+    """Список категорий."""
+    model = Category
+    template_name = "movies/category_list.html"
+    extra_context = {"title": "Категории"}
+
+
+class CategoryDetailView(DetailView):
+    """категория."""
+    model = Category
+    template_name = "movies/category_detail.html"  # "movies/movies.html"
+    extra_context = {"title": "Категория"}
+
+    # def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
+    #     context = super().get_context_data(**kwargs)
+    #     context["object_list"] = context["object"].movie_set.all()
+    #     return context
+
+
+class CategoryCreateView(CreateView):
+    """Создание категории."""
+    form_class = CategoryForm
+    template_name = "movies/category_create.html"
+    success_url = reverse_lazy("movies:category_list")
+    extra_context = {"title": "Создание новой категории"}
