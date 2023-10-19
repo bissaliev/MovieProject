@@ -7,7 +7,8 @@ from .models import (
     Movie,
     Comment,
     MovieActor,
-    Rating
+    Rating,
+    LikeDislike
 )
 
 
@@ -139,3 +140,9 @@ class ActorDirectorForm(forms.Form):
         widget=forms.CheckboxSelectMultiple,
         required=False
     )
+
+
+class LikeDislikeForm(forms.ModelForm):
+    class Meta:
+        model = LikeDislike
+        fields = ("vote",)

@@ -8,7 +8,9 @@ from .models import (
     Category,
     Comment,
     MovieActor,
-    Rating
+    Rating,
+    LikeDislike,
+    ContentType
 )
 
 
@@ -17,7 +19,8 @@ admin.site.register(Country)
 admin.site.register(Genre)
 admin.site.register(Category)
 admin.site.register(Comment)
-admin.site.register(Rating)
+admin.site.register(LikeDislike)
+admin.site.register(ContentType)
 
 
 class ActorInline(admin.TabularInline):

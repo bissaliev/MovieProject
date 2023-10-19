@@ -1,7 +1,16 @@
 from django.db import models
+from django.db.models import Sum
 from django.core.validators import MaxValueValidator
 from django.urls import reverse
 from django.utils import timezone
+from django.contrib.auth import get_user_model
+from django.contrib.contenttypes.models import ContentType
+from django.contrib.contenttypes.fields import (
+    GenericForeignKey, GenericRelation
+)
+
+
+User = get_user_model()
 
 
 def get_upload_path(instance, filename):
@@ -275,6 +284,7 @@ class Comment(models.Model):
         related_name="majors"
     )
     pub_date = models.DateTimeField("Время публикации", auto_now_add=True)
+    votes = GenericRelation(to="LikeDislike", related_query_name="comments")
 
     class Meta:
         verbose_name = "Комментарий"
@@ -290,3 +300,52 @@ class Comment(models.Model):
     #     validators=[MaxValueValidator(10, "Оценка должна быть не более 10.")],
     #     choices=range(1, 11)
     # )
+
+
+class LikeDislikeManager(models.Manager):
+    """Менеджер для модели LikeDislike."""
+
+    use_for_related_fields = True
+
+    def likes(self):
+        """Получаем лайки."""
+        return self.get_queryset().filter(vote__gt=0)
+
+    def dislikes(self):
+        """Получаем дизлайки."""
+        return self.get_queryset().filter(vote__lt=0)
+
+    def sum_rating(self):
+        """Получаем общую сумму."""
+        return self.get_queryset().aggregate(Sum("vote")).get("vote__sum") or 0
+
+    def comments(self):
+        """Получаем голоса для модели Comment."""
+        return self.get_queryset().filter(
+            content_type__model="comment"
+        ).order_by("-comments__pub_date")
+
+
+class LikeDislike(models.Model):
+    """Модель лайков и дизлайков."""
+    class Vote(models.IntegerChoices):
+        LIKE = 1, "нравится"
+        DISLIKE = -1, "не нравится"
+
+    vote = models.SmallIntegerField("Голос", choices=Vote.choices)
+    user = models.ForeignKey(
+        User, related_name="user_likes",
+        on_delete=models.CASCADE,
+        verbose_name="Пользователь"
+    )
+    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
+    object_id = models.PositiveIntegerField()
+    content_object = GenericForeignKey("content_type", "object_id")
+    objects = LikeDislikeManager()
+
+    class Meta:
+        verbose_name = "Лайк"
+        verbose_name_plural = "Лайки"
+
+    def __str__(self):
+        return f"{self.user} - {self.vote}"

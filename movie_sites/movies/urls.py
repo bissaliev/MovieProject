@@ -1,4 +1,4 @@
-from django.urls import path
+from django.urls import path, re_path
 from .views import (
     CategoryCreateView,
     CategoryDetailView,
@@ -19,8 +19,10 @@ from .views import (
     AddComment,
     AddRating,
     SearchPerson,
-    PersonCategoryView
+    PersonCategoryView,
+    LikeDislikeView
 )
+from .models import LikeDislike, Comment
 
 
 app_name = "movies"
@@ -69,5 +71,17 @@ urlpatterns = [
         name="country_create"
     ),
     path("comment/<int:pk>/", AddComment.as_view(), name="add_comment"),
-    path("add_rating/", AddRating.as_view(), name="add_rating")
+    path("add_rating/", AddRating.as_view(), name="add_rating"),
+    path(
+        "comment/<int:pk>/like/",
+        LikeDislikeView.as_view(),
+        name="comment_like"
+    ),
+    # re_path(
+        # r"^comments/(?P<pk>\d+)/dislike/$",
+        # LikeDislikeView.as_view(
+            # model=Comment, vote_type=LikeDislike.Vote.DISLIKE
+        # ),
+        # name="comment_dislike"
+    # )
 ]

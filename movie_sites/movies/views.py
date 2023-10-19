@@ -1,9 +1,10 @@
 from typing import Any
 from django.db.models import Avg, Q
 from django.db.models.query import QuerySet
+from django.contrib.contenttypes.models import ContentType
 from django.http import HttpResponse
 from django.shortcuts import redirect
-from .models import Person, Category, Genre, Country, Movie, Rating, MovieActor
+from .models import Person, Category, Genre, Country, Movie, Rating, MovieActor, LikeDislike, Comment
 from .forms import (
     PersonForm,
     CategoryForm,
@@ -14,7 +15,8 @@ from .forms import (
     RatingForm,
     MovieFormSet,
     FilterMovieForm,
-    ActorDirectorForm
+    ActorDirectorForm,
+    LikeDislikeForm
 )
 from .utils import get_ip
 from django.views.generic import ListView, CreateView, DetailView
@@ -191,6 +193,7 @@ class MovieDetailView(DetailView):
         else:
             context["rating_form"] = RatingForm()
         context["form"] = CommentForm()
+        context["likedislike_form"] = LikeDislikeForm()
         return context
 
 
@@ -299,3 +302,27 @@ class CategoryCreateView(CreateView):
     template_name = "movies/category_create.html"
     success_url = reverse_lazy("movies:category_list")
     extra_context = {"title": "Создание новой категории"}
+
+
+class LikeDislikeView(View):
+    model = Comment
+
+    def post(self, request, pk):
+        obj = self.model.objects.get(pk=pk)
+        content_type = ContentType.objects.get_for_model(obj)
+        try:
+            likedislike = LikeDislike.objects.get(
+                content_type=content_type, object_id=obj.id, user=request.user
+            )
+            if str(likedislike.vote) == self.request.POST.get("vote"):
+                print(self.request.POST.get("vote"))
+                print(likedislike.vote)
+                likedislike.delete()
+            else:
+                likedislike.vote = self.request.POST.get("vote")
+                likedislike.save(update_fields=["vote"])
+        except LikeDislike.DoesNotExist:
+            obj.votes.create(
+                user=request.user, vote=self.request.POST.get("vote")
+            )
+        return redirect(obj.movie.get_absolute_url())
