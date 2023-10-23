@@ -8,7 +8,6 @@ from .models import (
     Comment,
     MovieActor,
     Rating,
-    LikeDislike
 )
 
 
@@ -72,9 +71,9 @@ class RatingForm(forms.ModelForm):
 
 class FilterMovieForm(forms.Form):
     CHOICE_YEARS = [
-        (i, i) for i in set(
+        (i, i) for i in sorted(list(set(
             Movie.objects.values_list("release_year", flat=True)
-        )
+        )))
     ]
     NAME_SORT_CHOICES = (
         (None, "не выбрано"),
@@ -140,9 +139,3 @@ class ActorDirectorForm(forms.Form):
         widget=forms.CheckboxSelectMultiple,
         required=False
     )
-
-
-class LikeDislikeForm(forms.ModelForm):
-    class Meta:
-        model = LikeDislike
-        fields = ("vote",)

@@ -1,7 +1,7 @@
-from django.urls import path, re_path
+from django.urls import path
 from .views import (
     CategoryCreateView,
-    CategoryDetailView,
+    # CategoryDetailView,
     CategoryListView,
     PersonListView,
     PersonCreateView,
@@ -20,10 +20,10 @@ from .views import (
     AddRating,
     SearchPerson,
     PersonCategoryView,
-    LikeDislikeView
+    LikeDislikeView,
+    MovieCategoriesView
 )
-from .models import LikeDislike, Comment
-
+from .models import Comment, Person
 
 app_name = "movies"
 
@@ -47,9 +47,9 @@ urlpatterns = [
     ),
     path("categories/", CategoryListView.as_view(), name="category_list"),
     path(
-        "category/<slug:slug>",
-        CategoryDetailView.as_view(),
-        name="category_detail"
+        "category/<slug:category_slug>",
+        MovieCategoriesView.as_view(),
+        name="movie_categories"
     ),
     path(
         "category/create/",
@@ -73,15 +73,13 @@ urlpatterns = [
     path("comment/<int:pk>/", AddComment.as_view(), name="add_comment"),
     path("add_rating/", AddRating.as_view(), name="add_rating"),
     path(
-        "comment/<int:pk>/like/",
-        LikeDislikeView.as_view(),
-        name="comment_like"
+        "comment/<int:pk>/like_dislike/<str:vote>",
+        LikeDislikeView.as_view(model=Comment),
+        name="vote_comment"
     ),
-    # re_path(
-        # r"^comments/(?P<pk>\d+)/dislike/$",
-        # LikeDislikeView.as_view(
-            # model=Comment, vote_type=LikeDislike.Vote.DISLIKE
-        # ),
-        # name="comment_dislike"
-    # )
+    path(
+        "person/<int:pk>/like_dislike/<str:vote>",
+        LikeDislikeView.as_view(model=Person),
+        name="vote_person"
+    ),
 ]

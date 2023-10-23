@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load static %}
 {% load thumbnail %}
 {% load movie_tag %}
 {% block title %}{{title}}{% endblock title %}
@@ -11,7 +12,10 @@
                             <h3 class="sear-head editContent" >Поиск актера</h3>
                             <form action="{% url 'movies:search_person' %}" method="get" class="d-flex editContent" >
                                 <input type="search" placeholder="Введите имя актера..." name="search" class="form-control" required="">
-                                <button class="btn1 btn" ><span class="fa fa-search" aria-hidden="true" ></span></button>
+                                <button class="btn btn-primary" >
+                                    <img src="{% static 'img/search.svg' %}" alt="" style="width: 30px; height: 30px;">
+                                    {% comment %} <span class="fa fa-search" aria-hidden="true" ></span> {% endcomment %}
+                                </button>
                             </form>
                         </div>
                         <form action="{% url 'movies:person_category' %}" method="get">

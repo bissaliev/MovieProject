@@ -1,10 +1,20 @@
 from typing import Any
+from django.contrib import messages
 from django.db.models import Avg, Q
 from django.db.models.query import QuerySet
 from django.contrib.contenttypes.models import ContentType
 from django.http import HttpResponse
 from django.shortcuts import redirect
-from .models import Person, Category, Genre, Country, Movie, Rating, MovieActor, LikeDislike, Comment
+from .models import (
+    Person,
+    Category,
+    Genre,
+    Country,
+    Movie,
+    Rating,
+    MovieActor,
+    LikeDislike
+)
 from .forms import (
     PersonForm,
     CategoryForm,
@@ -15,14 +25,12 @@ from .forms import (
     RatingForm,
     MovieFormSet,
     FilterMovieForm,
-    ActorDirectorForm,
-    LikeDislikeForm
+    ActorDirectorForm
 )
 from .utils import get_ip
 from django.views.generic import ListView, CreateView, DetailView
 from django.urls import reverse_lazy
-# from django.views.generic.base import View
-from django.views import View
+from django.views.generic.base import View
 
 
 class MovieCreateView(CreateView):
@@ -139,31 +147,23 @@ class PersonDetailView(DetailView):
     pk_url_kwarg = "person_id"
 
 
-class MovieListView(ListView):
-    """Список фильмов."""
-    model = Movie
-    template_name = "movies/movies.html"
-    extra_context = {"title": "Фильмы"}
-
+class FilterOrderMixin:
     def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
         context = super().get_context_data(**kwargs)
         context["filter_form"] = FilterMovieForm(self.request.GET)
-        # context["form_ordering"] = SortMovieForm()
         return context
 
     def get_queryset(self):
         queryset = super().get_queryset().order_by()
-        query_filter = []
         filter_genres = self.request.GET.getlist("filter_genres")
         filter_rating = self.request.GET.get("filter_rating")
         filter_years = self.request.GET.getlist("filter_years")
         if filter_genres:
-            query_filter.append(queryset.filter(genres__id__in=filter_genres))
+            queryset = queryset.filter(genres__id__in=filter_genres)
         if filter_rating:
-            query_filter.append(queryset.filter(rating__gte=filter_rating))
+            queryset = queryset.filter(rating__gte=filter_rating)
         if filter_years:
-            query_filter.append(queryset.filter(release_year__in=filter_years))
-        queryset = queryset.intersection(*query_filter)
+            queryset = queryset.filter(release_year__in=filter_years)
         sort = []
         name = self.request.GET.get("name")
         release_year = self.request.GET.get("release_year")
@@ -176,6 +176,13 @@ class MovieListView(ListView):
             sort.append(rating)
         queryset = queryset.order_by(*sort)
         return queryset
+
+
+class MovieListView(FilterOrderMixin, ListView):
+    """Список фильмов."""
+    model = Movie
+    template_name = "movies/movies.html"
+    extra_context = {"title": "Фильмы"}
 
 
 class MovieDetailView(DetailView):
@@ -193,7 +200,6 @@ class MovieDetailView(DetailView):
         else:
             context["rating_form"] = RatingForm()
         context["form"] = CommentForm()
-        context["likedislike_form"] = LikeDislikeForm()
         return context
 
 
@@ -287,13 +293,19 @@ class CategoryListView(ListView):
 class CategoryDetailView(DetailView):
     """категория."""
     model = Category
-    template_name = "movies/category_detail.html"  # "movies/movies.html"
+    template_name = "movies/movies.html"
+    context_object_name = "object_list"
+    slug_url_kwarg = "category_slug"
     extra_context = {"title": "Категория"}
 
-    # def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
-    #     context = super().get_context_data(**kwargs)
-    #     context["object_list"] = context["object"].movie_set.all()
-    #     return context
+
+class MovieCategoriesView(FilterOrderMixin, ListView):
+    model = Movie
+    template_name = "movies/movies.html"
+
+    def get_queryset(self) -> QuerySet[Any]:
+        category_slug = self.kwargs["category_slug"]
+        return super().get_queryset().filter(category__slug=category_slug)
 
 
 class CategoryCreateView(CreateView):
@@ -305,24 +317,23 @@ class CategoryCreateView(CreateView):
 
 
 class LikeDislikeView(View):
-    model = Comment
+    model = None
 
-    def post(self, request, pk):
+    def get(self, request, pk, vote):
+        votes = {
+            "1": "like",
+            "-1": "dislike"
+        }
         obj = self.model.objects.get(pk=pk)
         content_type = ContentType.objects.get_for_model(obj)
-        try:
-            likedislike = LikeDislike.objects.get(
-                content_type=content_type, object_id=obj.id, user=request.user
-            )
-            if str(likedislike.vote) == self.request.POST.get("vote"):
-                print(self.request.POST.get("vote"))
-                print(likedislike.vote)
-                likedislike.delete()
-            else:
-                likedislike.vote = self.request.POST.get("vote")
-                likedislike.save(update_fields=["vote"])
-        except LikeDislike.DoesNotExist:
-            obj.votes.create(
-                user=request.user, vote=self.request.POST.get("vote")
-            )
-        return redirect(obj.movie.get_absolute_url())
+        likedislike, created = LikeDislike.objects.get_or_create(
+            user=request.user, content_type=content_type, object_id=obj.id
+        )
+        if not created and likedislike.vote == int(vote):
+            likedislike.delete()
+            messages.success(request, f"{votes[vote]} удален")
+        else:
+            likedislike.vote = vote
+            likedislike.save()
+            messages.success(request, f"{votes[vote]} создан")
+        return redirect(request.META.get("HTTP_REFERER", "/"))

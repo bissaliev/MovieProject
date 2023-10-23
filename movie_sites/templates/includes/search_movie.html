@@ -1,7 +1,10 @@
+{% load static %}
 <div class="search-bar w3layouts-newsletter m-3">
     <h3 class="sear-head editContent" >Поиск фильма</h3>
     <form action="{% url 'movies:search' %}" method="get" class="d-flex editContent" >
         <input type="search" placeholder="Введите название..." name="search" class="form-control" required="">
-        <button class="btn1 btn" ><span class="fa fa-search" aria-hidden="true" ></span></button>
+        <button class="btn btn-primary" >
+            <img src="{% static 'img/search.svg' %}" alt="" style="width: 30px; height: 30px;">
+        </button>
     </form>
 </div>

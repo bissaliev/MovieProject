@@ -17,6 +17,15 @@
     {%include 'includes/navigator.html' %}
     {%include 'includes/header.html' %}
     <main class="container-fluid py-5" style="background-color: aquamarine;">
+      {% if messages %}
+        <ul class="text-center">
+          {% for message in messages %}
+            <li {% if message.tags %} class="{{ message.tags }}"{% endif %}>
+              <h4>{{ message }}</h4>
+            </li>
+          {% endfor %}
+        </ul>
+      {% endif %}
       <div id="page" class="page">
         {% block content %}
         {% endblock %}

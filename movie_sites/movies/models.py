@@ -58,6 +58,7 @@ class Person(models.Model):
         verbose_name="Страна",
         related_name="%(class)ss",
     )
+    votes = GenericRelation(to="LikeDislike", related_query_name="person")
 
     class Meta:
         verbose_name = "Персона"
@@ -84,6 +85,16 @@ class Person(models.Model):
             < (self.birthdate.month, self.birthdate.day)
         )
         return age
+
+    def get_like_count(self):
+        return self.votes.filter(vote__gt=0).count()
+
+    def get_dislike_count(self):
+        return self.votes.filter(vote__lt=0).count()
+
+    def get_like_rating(self):
+        return self.votes.values(
+            "vote").aggregate(Sum("vote")).get("vote__sum")
 
 
 class AbstractCategory(models.Model):
@@ -120,7 +131,9 @@ class Category(AbstractCategory):
         verbose_name_plural = "Категории"
 
     def get_absolute_url(self):
-        return reverse("movies:category_detail", kwargs={"slug": self.slug})
+        return reverse(
+            "movies:category_detail", kwargs={"category_slug": self.slug}
+        )
 
 
 class Genre(AbstractCategory):
@@ -158,6 +171,7 @@ class Movie(models.Model):
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
+        related_name="movies"
     )
     genres = models.ManyToManyField(
         to="Genre",
@@ -284,7 +298,7 @@ class Comment(models.Model):
         related_name="majors"
     )
     pub_date = models.DateTimeField("Время публикации", auto_now_add=True)
-    votes = GenericRelation(to="LikeDislike", related_query_name="comments")
+    votes = GenericRelation(to="LikeDislike", related_query_name="comment")
 
     class Meta:
         verbose_name = "Комментарий"
@@ -294,36 +308,11 @@ class Comment(models.Model):
     def __str__(self):
         return f"{self.name} - {self.movie}"
 
-    # score = models.PositiveSmallIntegerField(
-    #     "Оценка",
-    #     default=0,
-    #     validators=[MaxValueValidator(10, "Оценка должна быть не более 10.")],
-    #     choices=range(1, 11)
-    # )
+    def get_like_count(self):
+        return self.votes.filter(vote__gt=0).count()
 
-
-class LikeDislikeManager(models.Manager):
-    """Менеджер для модели LikeDislike."""
-
-    use_for_related_fields = True
-
-    def likes(self):
-        """Получаем лайки."""
-        return self.get_queryset().filter(vote__gt=0)
-
-    def dislikes(self):
-        """Получаем дизлайки."""
-        return self.get_queryset().filter(vote__lt=0)
-
-    def sum_rating(self):
-        """Получаем общую сумму."""
-        return self.get_queryset().aggregate(Sum("vote")).get("vote__sum") or 0
-
-    def comments(self):
-        """Получаем голоса для модели Comment."""
-        return self.get_queryset().filter(
-            content_type__model="comment"
-        ).order_by("-comments__pub_date")
+    def get_dislike_count(self):
+        return self.votes.filter(vote__lt=0).count()
 
 
 class LikeDislike(models.Model):
@@ -332,20 +321,48 @@ class LikeDislike(models.Model):
         LIKE = 1, "нравится"
         DISLIKE = -1, "не нравится"
 
-    vote = models.SmallIntegerField("Голос", choices=Vote.choices)
+    vote = models.SmallIntegerField("Голос", choices=Vote.choices, null=True)
     user = models.ForeignKey(
         User, related_name="user_likes",
         on_delete=models.CASCADE,
         verbose_name="Пользователь"
     )
-    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
+    content_type = models.ForeignKey(
+        ContentType,
+        on_delete=models.CASCADE,
+        related_name="likes"
+    )
     object_id = models.PositiveIntegerField()
     content_object = GenericForeignKey("content_type", "object_id")
-    objects = LikeDislikeManager()
 
     class Meta:
         verbose_name = "Лайк"
         verbose_name_plural = "Лайки"
 
     def __str__(self):
-        return f"{self.user} - {self.vote}"
+        return f"{self.user} - ({self.vote})"
+
+
+# class LikeDislikeManager(models.Manager):
+#     """Менеджер для модели LikeDislike."""
+
+#     use_for_related_fields = True
+
+#     def likes(self):
+#         """Получаем лайки."""
+#         return self.get_queryset().filter(vote__gt=0)
+
+#     def dislikes(self):
+#         """Получаем дизлайки."""
+#         return self.get_queryset().filter(vote__lt=0)
+
+#     def sum_rating(self):
+#         """Получаем общую сумму."""
+#         return self.get_queryset().aggregate(Sum("vote")).get("vote__sum") or 0
+
+#     def comments(self):
+#         """Получаем голоса для модели Comment."""
+#         return self.get_queryset().filter(
+#             content_type__model="comment"
+#         ).order_by("-comments__pub_date")
+
