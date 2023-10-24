@@ -103,6 +103,11 @@ class FilterMovieForm(forms.Form):
         queryset=Genre.objects.all(), widget=forms.CheckboxSelectMultiple,
         label="Жанры"
     )
+    filter_countries = forms.ModelChoiceField(
+        queryset=Country.objects.all(),
+        widget=forms.CheckboxSelectMultiple,
+        label="Страны"
+    )
     filter_years = forms.MultipleChoiceField(
         choices=CHOICE_YEARS, widget=forms.CheckboxSelectMultiple,
         label="Года"
@@ -114,7 +119,8 @@ class FilterMovieForm(forms.Form):
 
     class Meta:
         fields = (
-            "name", "release_year", "rating", "genres", "years", "rating"
+            "name", "release_year", "rating", "genres", "years", "rating",
+            "filter_countries"
         )
 
 

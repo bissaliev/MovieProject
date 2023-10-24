@@ -157,6 +157,7 @@ class FilterOrderMixin:
         queryset = super().get_queryset().order_by()
         filter_genres = self.request.GET.getlist("filter_genres")
         filter_rating = self.request.GET.get("filter_rating")
+        filter_countries = self.request.GET.get("filter_countries")
         filter_years = self.request.GET.getlist("filter_years")
         if filter_genres:
             queryset = queryset.filter(genres__id__in=filter_genres)
@@ -164,6 +165,8 @@ class FilterOrderMixin:
             queryset = queryset.filter(rating__gte=filter_rating)
         if filter_years:
             queryset = queryset.filter(release_year__in=filter_years)
+        if filter_countries:
+            queryset = queryset.filter(countries__id__in=filter_countries)
         sort = []
         name = self.request.GET.get("name")
         release_year = self.request.GET.get("release_year")

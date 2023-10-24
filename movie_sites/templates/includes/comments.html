@@ -1,4 +1,5 @@
 {% load static %}
+{% load movie_tag %}
 <div class="row mx-5 px-5">
     <div>
         <!-- contact form grid -->
@@ -38,12 +39,24 @@
             </p>
             <a href="#formComment" onclick="addComment('{{comment.name}}', '{{comment.id}}')">Ответить</a>
             {% if user.is_authenticated %}
+                {% get_status_vote comment request.user as vote %}
+                {% if vote %}
+                    есть контент
+                {% endif %}
                 <a class="btn btn-primary" href="{% url 'movies:vote_comment' comment.id '1' %}">
-                    <img style="width: 30px; height: 30px;" src="{% static 'img/like.svg' %}" alt="За стеклом">
+                    {% if vote == 1 %}
+                        <img style="width: 30px; height: 30px;" src="{% static 'img/like2_1.svg' %}" alt="За стеклом">
+                    {% else %}
+                        <img style="width: 30px; height: 30px;" src="{% static 'img/like2_2.svg' %}" alt="За стеклом">
+                    {% endif %}
                     {{comment.get_like_count}}
                 </a>
                 <a class="btn btn-primary" href="{% url 'movies:vote_comment' comment.id '-1' %}">
-                    <img style="width: 30px; height: 30px;" src="{% static 'img/dislike.svg' %}" alt="За стеклом">
+                    {% if vote == -1 %}
+                        <img style="width: 30px; height: 30px;" src="{% static 'img/dislike1_1.svg' %}" alt="За стеклом">
+                    {% else %}
+                        <img style="width: 30px; height: 30px;" src="{% static 'img/dislike1_2.svg' %}" alt="За стеклом">
+                    {% endif %}
                     {{comment.get_dislike_count}}
                 </a>
             {% endif %}
@@ -56,12 +69,21 @@
                         <h5 class="mt-0">{{com.name}}</h5>
                         <p class="mt-2"> {{com.text}}</p>
                         {% if user.is_authenticated %}
+                            {% get_status_vote com request.user as vote %}
                             <a class="btn btn-primary" href="{% url 'movies:vote_comment' com.id '1' %}">
-                                <img style="width: 30px; height: 30px;" src="{% static 'img/like.svg' %}" alt="За стеклом">
+                                {% if vote == 1 %}
+                                    <img style="width: 30px; height: 30px;" src="{% static 'img/like2_1.svg' %}" alt="За стеклом">
+                                {% else %}
+                                    <img style="width: 30px; height: 30px;" src="{% static 'img/like2_2.svg' %}" alt="За стеклом">
+                                {% endif %}
                                 {{com.get_like_count}}
                             </a>
                             <a class="btn btn-primary" href="{% url 'movies:vote_comment' com.id '-1' %}">
-                                <img style="width: 30px; height: 30px;" src="{% static 'img/dislike.svg' %}" alt="За стеклом">
+                                {% if vote == -1 %}
+                                    <img style="width: 30px; height: 30px;" src="{% static 'img/dislike1_1.svg' %}" alt="За стеклом">
+                                {% else %}
+                                    <img style="width: 30px; height: 30px;" src="{% static 'img/dislike1_2.svg' %}" alt="За стеклом">
+                                {% endif %}
                                 {{com.get_dislike_count}}
                             </a>
                         {% endif %}
