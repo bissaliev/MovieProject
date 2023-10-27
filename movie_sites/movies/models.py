@@ -24,7 +24,7 @@ class Person(models.Model):
     M = "М"
     F = "F"
     U = "U"
-    GENDER_CHOICES = [(M, "Мужчина"), (F, "Женщина"), (U, "Unknown")]
+    GENDER_CHOICES = [(M, "Мужчина"), (F, "Женщина"), (U, "Неизвестно")]
 
     first_name = models.CharField("Имя", max_length=100)
     last_name = models.CharField("Фамилия", max_length=100, db_index=True)
@@ -58,7 +58,10 @@ class Person(models.Model):
         verbose_name="Страна",
         related_name="%(class)ss",
     )
-    votes = GenericRelation(to="LikeDislike", related_query_name="person")
+    votes = GenericRelation(to="LikeDislike", related_query_name="person_vote")
+    bookmarks = GenericRelation(
+        to="Bookmark", related_query_name="person_bookmark"
+    )
 
     class Meta:
         verbose_name = "Персона"
@@ -155,13 +158,7 @@ class Movie(models.Model):
     name = models.CharField("Название", max_length=100, db_index=True)
     description = models.TextField("Описание", blank=True, null=True)
     release_year = models.PositiveSmallIntegerField(
-        "Год выпуска",
-        validators=[
-            MaxValueValidator(
-                timezone.now().year,
-                "Год выпуска не может быть больше нынешнего!"
-            )
-        ],
+        "Год выпуска"
     )
     poster = models.ImageField(
         "Постер", upload_to="movies/%Y/%m/%d", null=True, blank=True
@@ -200,6 +197,7 @@ class Movie(models.Model):
     )
     pub_date = models.DateTimeField("Дата публикации", auto_now_add=True)
     rating = models.FloatField(null=True, blank=True, default=0)
+    bookmarks = GenericRelation(to="Bookmark", related_query_name="movie")
 
     class Meta:
         verbose_name = "Фильм"
@@ -340,7 +338,40 @@ class LikeDislike(models.Model):
         verbose_name_plural = "Лайки"
 
     def __str__(self):
-        return f"{self.user} - ({self.vote})"
+        return f"{self.user} - {self.content_type}: ({self.vote})"
+
+
+class BookmarksManager(models.Manager):
+    use_for_related_fields = True
+
+    def get_bookmark_defined_model(self, model: str, user):
+        return self.get_queryset().filter(
+            content_type__model=model, user=user
+        )
+
+
+class Bookmark(models.Model):
+    user = models.ForeignKey(
+        to=User,
+        on_delete=models.CASCADE,
+        related_name="bookmarks",
+        verbose_name="Пользователь"
+    )
+    content_type = models.ForeignKey(
+        ContentType,
+        on_delete=models.CASCADE,
+        related_name="bookmarks",
+        verbose_name="Закладка"
+    )
+    object_id = models.PositiveIntegerField()
+    content_object = GenericForeignKey("content_type", "object_id")
+
+    class Meta:
+        verbose_name = "Закладка"
+        verbose_name_plural = "Закладки"
+
+    def __str__(self):
+        return f"{self.user} - {self.content_type}"
 
 
 # class LikeDislikeManager(models.Manager):

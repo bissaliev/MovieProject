@@ -1,0 +1,9 @@
+{% load static %}
+{% load movie_tag %}
+{% load thumbnail %}
+<div class="side-bar col-lg-3" style="background-color: dimgray;">
+    <div style="margin: 10px; font-size: 30px;">
+        <p><a href="{% url 'movies:bookmark_persons' %}">Персоны</a></p>
+        <p><a href="{% url 'movies:bookmark_movies' %}">Фильмы</a></p>
+    </div>
+</div>

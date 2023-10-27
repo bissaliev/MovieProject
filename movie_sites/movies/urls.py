@@ -15,22 +15,22 @@ from .views import (
     MovieListView,
     MovieDetailView,
     MovieCreateView,
-    SearchMovie,
     AddComment,
     AddRating,
-    SearchPerson,
-    PersonCategoryView,
     LikeDislikeView,
-    MovieCategoriesView
+    MovieCategoriesView,
+    AddBookmarkView,
+    BookmarkListView,
+    BookmarkMainListView
+    # ProfileView
 )
-from .models import Comment, Person
+from .models import Comment, Person, Movie
+from .filters import FilterOrderMovieMixin
 
 app_name = "movies"
 
 urlpatterns = [
     path("", MovieListView.as_view(), name="index"),
-    path("search/", SearchMovie.as_view(), name="search"),
-    path("search_person/", SearchPerson.as_view(), name="search_person"),
     path(
         "movie/<int:movie_id>/",
         MovieDetailView.as_view(),
@@ -38,7 +38,6 @@ urlpatterns = [
     ),
     path("movie/create/", MovieCreateView.as_view(), name="movie_create"),
     path("persons/", PersonListView.as_view(), name="persons"),
-    path("person_cat/", PersonCategoryView.as_view(), name="person_category"),
     path("person/create/", PersonCreateView.as_view(), name="person_create"),
     path(
         "person/<int:person_id>/",
@@ -81,5 +80,32 @@ urlpatterns = [
         "person/<int:pk>/like_dislike/<str:vote>",
         LikeDislikeView.as_view(model=Person),
         name="vote_person"
+    ),
+    path(
+        "person/<int:pk>/bookmark",
+        AddBookmarkView.as_view(model=Person),
+        name="add_bookmark_person"
+        ),
+    path(
+        "movie/<int:pk>/bookmark",
+        AddBookmarkView.as_view(model=Movie),
+        name="add_bookmark_movie"
+        ),
+    path(
+        "bookmarks/",
+        BookmarkMainListView.as_view(),
+        name="bookmarks"
+    ),
+    path(
+        "bookmark/persons",
+        BookmarkListView.as_view(
+            model=Person, template_name="movies/person_list.html"),
+        name="bookmark_persons"
+    ),
+    path(
+        "bookmark/movies",
+        BookmarkListView.as_view(
+            model=Movie, template_name="movies/movies.html"),
+        name="bookmark_movies"
     ),
 ]

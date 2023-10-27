@@ -1,0 +1,31 @@
+{% load thumbnail %}
+{% load movie_tag %}
+{% load static %}
+{% for obj in object_list %}
+<div class="col-md-4 product-men">
+    <div class="product-shoe-info editContent text-center mt-lg-4" >
+        <div class="men-thumb-item" style="position: relative;">
+            {% thumbnail obj.picture "400x400" crop="center" as picture %}
+                <img src="{{picture.url}}"alt="" width="{{picture.width}}" height="{{picture.height}}">
+            {% endthumbnail %}
+            <div style="position: absolute; bottom: 30px; right: 10px;">
+                {% if user.is_authenticated %}
+                    {% bookmark_is_exists obj user as bookmark %}
+                    <a class="btn btn-primary" href="{% url 'movies:add_bookmark_person' obj.id %}">
+                        {% if bookmark %}
+                            <img style="width: 20px; height: 20px;" src="{% static 'img/bookmark_is.svg' %}" alt="За стеклом">
+                        {% else %}
+                            <img style="width: 20px; height: 20px;" src="{% static 'img/bookmark_not.svg' %}" alt="За стеклом">
+                        {% endif%}
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+        <div class="item-info-product">
+            <h4 class="">
+                <a href="{{obj.get_absolute_url}}" class="editContent" >{{obj.first_name}} {{obj.last_name}}</a>
+            </h4>
+        </div>
+    </div>
+</div>
+{% endfor %}

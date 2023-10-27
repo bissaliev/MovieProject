@@ -1,10 +1,11 @@
+from collections.abc import Sequence
 from typing import Any
 from django.contrib import messages
-from django.db.models import Avg, Q
+from django.db.models import Avg
 from django.db.models.query import QuerySet
 from django.contrib.contenttypes.models import ContentType
 from django.http import HttpResponse
-from django.shortcuts import redirect
+from django.shortcuts import redirect, render
 from .models import (
     Person,
     Category,
@@ -12,8 +13,8 @@ from .models import (
     Country,
     Movie,
     Rating,
-    MovieActor,
-    LikeDislike
+    LikeDislike,
+    Bookmark
 )
 from .forms import (
     PersonForm,
@@ -23,14 +24,13 @@ from .forms import (
     MovieForm,
     CommentForm,
     RatingForm,
-    MovieFormSet,
-    FilterMovieForm,
-    ActorDirectorForm
+    MovieFormSet
 )
 from .utils import get_ip
+from .filters import FilterOrderPersonMixin, FilterOrderMovieMixin, FilterOrderMultipleMixin
 from django.views.generic import ListView, CreateView, DetailView
 from django.urls import reverse_lazy
-from django.views.generic.base import View
+from django.views.generic.base import View, TemplateView
 
 
 class MovieCreateView(CreateView):
@@ -72,63 +72,12 @@ class MovieCreateView(CreateView):
         )
 
 
-class SearchMovie(ListView):
-    """Поиск фильмов по названию."""
-    template_name = "movies/movies.html"
-
-    def get_queryset(self):
-        return Movie.objects.filter(
-            name__icontains=self.request.GET.get("search")
-        )
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context["search"] = self.request.GET.get("search")
-        return context
-
-
-class SearchPerson(SearchMovie):
-    template_name = "movies/person_list.html"
-
-    def get_queryset(self):
-        search = self.request.GET.get("search")
-        return Person.objects.filter(
-            Q(first_name__icontains=search) |
-            Q(last_name__icontains=search)
-        )
-
-
-class PersonCategoryView(ListView):
-    template_name = "movies/person_list.html"
-
-    def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
-        context = super().get_context_data(**kwargs)
-        context["category_form"] = ActorDirectorForm(self.request.GET)
-        return context
-
-    def get_queryset(self) -> QuerySet[Any]:
-        queryset = Person.objects.all()
-        actor_ids = MovieActor.objects.values_list("actor_id", flat=True)
-        if self.request.GET.get("profile"):
-            if self.request.GET.get("profile") == "actors":
-                queryset = queryset.filter(id__in=actor_ids)
-            else:
-                queryset = queryset.exclude(id__in=actor_ids)
-        if self.request.GET.get("gender"):
-            return queryset.filter(gender=self.request.GET.get("gender"))
-        return queryset
-
-
-class PersonListView(ListView):
+class PersonListView(FilterOrderPersonMixin, ListView):
     """Список персон."""
     model = Person
     template_name = "movies/person_list.html"
+    paginate_by = 6
     extra_context = {"title": "Персоны"}
-
-    def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
-        context = super().get_context_data(**kwargs)
-        context["category_form"] = ActorDirectorForm()
-        return context
 
 
 class PersonCreateView(CreateView):
@@ -147,44 +96,11 @@ class PersonDetailView(DetailView):
     pk_url_kwarg = "person_id"
 
 
-class FilterOrderMixin:
-    def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
-        context = super().get_context_data(**kwargs)
-        context["filter_form"] = FilterMovieForm(self.request.GET)
-        return context
-
-    def get_queryset(self):
-        queryset = super().get_queryset().order_by()
-        filter_genres = self.request.GET.getlist("filter_genres")
-        filter_rating = self.request.GET.get("filter_rating")
-        filter_countries = self.request.GET.get("filter_countries")
-        filter_years = self.request.GET.getlist("filter_years")
-        if filter_genres:
-            queryset = queryset.filter(genres__id__in=filter_genres)
-        if filter_rating:
-            queryset = queryset.filter(rating__gte=filter_rating)
-        if filter_years:
-            queryset = queryset.filter(release_year__in=filter_years)
-        if filter_countries:
-            queryset = queryset.filter(countries__id__in=filter_countries)
-        sort = []
-        name = self.request.GET.get("name")
-        release_year = self.request.GET.get("release_year")
-        rating = self.request.GET.get("rating")
-        if name:
-            sort.append(name)
-        if release_year:
-            sort.append(release_year)
-        if rating:
-            sort.append(rating)
-        queryset = queryset.order_by(*sort)
-        return queryset
-
-
-class MovieListView(FilterOrderMixin, ListView):
+class MovieListView(FilterOrderMovieMixin, ListView):
     """Список фильмов."""
     model = Movie
     template_name = "movies/movies.html"
+    paginate_by = 6
     extra_context = {"title": "Фильмы"}
 
 
@@ -297,14 +213,14 @@ class CategoryDetailView(DetailView):
     """категория."""
     model = Category
     template_name = "movies/movies.html"
-    context_object_name = "object_list"
     slug_url_kwarg = "category_slug"
     extra_context = {"title": "Категория"}
 
 
-class MovieCategoriesView(FilterOrderMixin, ListView):
+class MovieCategoriesView(FilterOrderMovieMixin, ListView):
     model = Movie
     template_name = "movies/movies.html"
+    paginate_by = 6
 
     def get_queryset(self) -> QuerySet[Any]:
         category_slug = self.kwargs["category_slug"]
@@ -340,3 +256,42 @@ class LikeDislikeView(View):
             likedislike.save()
             messages.success(request, f"{votes[vote]} создан")
         return redirect(request.META.get("HTTP_REFERER", "/"))
+
+
+class AddBookmarkView(View):
+    model = None
+
+    def get(self, request, pk):
+        bookmark, created = Bookmark.objects.get_or_create(
+            user=request.user,
+            content_type=ContentType.objects.get_for_model(self.model),
+            object_id=pk
+        )
+        if not created:
+            bookmark.delete()
+        return redirect(request.META.get("HTTP_REFERER", "/"))
+
+
+class BookmarkListView(FilterOrderMultipleMixin, ListView):
+    model = None
+    template_name = None
+    paginate_by = 6
+
+    def get_queryset(self) -> QuerySet[Any]:
+        return super().get_queryset().filter(bookmarks__user=self.request.user)
+
+
+class BookmarkMainListView(TemplateView):
+    models = [Person, Movie]
+    template_name = "movies/bookmark_list.html"
+
+    def get(self, request, *args, **kwargs):
+        bookmarks = {}
+        for model in self.models:
+            bookmarks[model.__name__.lower()] = model.objects.filter(
+                bookmarks__user=request.user
+            )[:5]
+
+        context = self.get_context_data(**kwargs)
+        context["bookmarks"] = bookmarks
+        return self.render_to_response(context)

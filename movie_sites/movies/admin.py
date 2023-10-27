@@ -10,6 +10,7 @@ from .models import (
     MovieActor,
     Rating,
     LikeDislike,
+    Bookmark,
     ContentType
 )
 
@@ -19,7 +20,9 @@ admin.site.register(Country)
 admin.site.register(Genre)
 admin.site.register(Category)
 admin.site.register(Comment)
+admin.site.register(Rating)
 admin.site.register(LikeDislike)
+admin.site.register(Bookmark)
 admin.site.register(ContentType)
 
 

@@ -75,29 +75,26 @@ class FilterMovieForm(forms.Form):
             Movie.objects.values_list("release_year", flat=True)
         )))
     ]
-    NAME_SORT_CHOICES = (
-        (None, "не выбрано"),
-        ("name", "А-Я"),
-        ("-name", "Я-А")
+    SORT_CHOICES = (
+        ("по заголовку", (
+            ("name", "А-Я"),
+            ("-name", "Я-А")
+        )),
+        ("по годам", (
+            ("release_year", "На возрастание"),
+            ("-release_year", "На убывание")
+        )),
+        ("по рейтингу", (
+            ("rating", "На возрастание"),
+            ("-rating", "На убывание")
+        )),
     )
-    YEAR_SORT_CHOICES = (
-        (None, "не выбрано"),
-        ("release_year", "На возрастание"),
-        ("-release_year", "На убывание")
-    )
-    RATING_SORT_CHOICES = (
-        (None, "не выбрано"),
-        ("rating", "На возрастание"),
-        ("-rating", "На убывание")
-    )
-    name = forms.ChoiceField(
-        choices=NAME_SORT_CHOICES, label="По заголовку", required=False
-    )
-    release_year = forms.ChoiceField(
-        choices=YEAR_SORT_CHOICES, label="По годам", required=False
-    )
-    rating = forms.ChoiceField(
-        choices=RATING_SORT_CHOICES, label="По рейтингу", required=False
+    search = forms.CharField(required=False, label="Поиск")
+    sort = forms.ChoiceField(
+        choices=SORT_CHOICES,
+        widget=forms.Select,
+        label="Сортировать по:",
+        required=False,
     )
     filter_genres = forms.ModelChoiceField(
         queryset=Genre.objects.all(), widget=forms.CheckboxSelectMultiple,
@@ -120,7 +117,7 @@ class FilterMovieForm(forms.Form):
     class Meta:
         fields = (
             "name", "release_year", "rating", "genres", "years", "rating",
-            "filter_countries"
+            "filter_countries", "search"
         )
 
 
@@ -129,13 +126,21 @@ MovieFormSet = forms.inlineformset_factory(
 )
 
 
-class ActorDirectorForm(forms.Form):
-    CHOICE_PERSON_PROFILE = [
+class FilterPersonForm(forms.Form):
+    PERSON_PROFILE_CHOICES = [
         ("actors", "Актеры"),
         ("directors", "Режиссеры"),
     ]
+    SORT_CHOICES = [
+        ("по имени", (("first_name", "А-Я"), ("-first_name", "Я-А"))),
+        ("по фамилии", (("last_name", "А-Я"), ("-last_name", "Я-А"))),
+        ("по дате рождения", (
+            ("birthdate", "На возрастание"), ("-birthdate", "На убывание")
+        ))
+    ]
+    search = forms.CharField(required=False, label="Поиск")
     profile = forms.ChoiceField(
-        choices=CHOICE_PERSON_PROFILE,
+        choices=PERSON_PROFILE_CHOICES,
         label="Категория",
         widget=forms.CheckboxSelectMultiple
     )
@@ -145,3 +150,9 @@ class ActorDirectorForm(forms.Form):
         widget=forms.CheckboxSelectMultiple,
         required=False
     )
+    sort = forms.ChoiceField(
+        choices=SORT_CHOICES, widget=forms.Select, label="Сортировать по:"
+    )
+
+    class Meta:
+        fields = ("search", "profile", "gender", "sort")

@@ -1,5 +1,7 @@
 {% extends 'base.html' %}
 {% load thumbnail %}
+{% load movie_tag %}
+{% load static %}
 {% block title %}Главная страница{% endblock title %}
 {% block content %}
 <div class="left-ads-display py-md-5 py-4 margin-top:10px" style="margin-top:10px">
@@ -13,7 +15,7 @@
             <h3 class="editContent" style="outline: none; cursor: inherit;">{{object.name}}</h3>
             <ul>
                 <li style="list-style: none"><span><b>Год:</b> {{object.release_year}} </span></li>
-                <li style="list-style: none"><span><b>Страна:</b> {% for country in object.countries.all %}{{country}},</b>{% endfor %}</span>
+                <li style="list-style: none"><span><b>Страна:</b> {{ object.countries.all|join:', ' }}</span>
                 </li>
                 <li style="list-style: none"><span><b>Слоган:</b> «Welcome to the Day after Judgment Day»</span>
                 </li>
@@ -43,9 +45,7 @@
                 </li>
                 <li class="py-4" style="list-style: none">
                     <span><b>Жанр:</b>
-                        {% for genre in object.genres.all %}
-                            {{genre}},
-                        {% endfor %}
+                        {{ object.genres.all|join:', ' }}
                     </span>
                 </li>
                 <li style="list-style: none"><span><b>Премьера в мире:</b> 23 октября 2019</span>
@@ -80,6 +80,20 @@
                             <input type="hidden" value="{{object.id}}" name="movie">
                             {{rating_form}}
                         </form>
+                    </div>
+                </li>
+                <li style="list-style: none">
+                    <div class="sub-para-w3layouts mt-2">
+                        {% if user.is_authenticated %}
+                        {% bookmark_is_exists object user as bookmark %}
+                            <a class="btn btn-primary" href="{% url 'movies:add_bookmark_movie' object.id %}">
+                                {% if bookmark %}
+                                    <img style="width: 30px; height: 30px;" src="{% static 'img/bookmark_is.svg' %}" alt="За стеклом">
+                                {% else %}
+                                    <img style="width: 30px; height: 30px;" src="{% static 'img/bookmark_not.svg' %}" alt="За стеклом">
+                                {% endif%}
+                            </a>
+                        {% endif %}
                     </div>
                 </li>
                 <li style="list-style: none">

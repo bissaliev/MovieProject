@@ -1,92 +1,16 @@
 {% extends 'base.html' %}
-{% load thumbnail %}
-{% load movie_tag %}
 {% block title %}{{title}}{% endblock title %}
 {% block content %}
     <section class="ab-info-main py-md-5 py-4 editContent" style="padding-left: 3rem; padding-right: 3rem;">
         <div class="container-fluid py-md-3">
             <div class="row">
-                <div class="side-bar col-lg-3" style="background-color: dimgray;">
-                    {% include 'includes/search_movie.html' %}
-                    <form method="get" name="filter">
-                        <div class="form-group">
-                            {% comment %} <button type="submit" class="btn btn-sm btn-primary btn-raised mr-3">Сортировать</button> {% endcomment %}
-                            {% comment %} {{form_ordering}} {% endcomment %}
-                            <button type="submit" class="btn btn-sm btn-primary btn-raised m-3">Сортировать</button>
-                            <p>
-                                {{filter_form.name.label}}
-                                {{filter_form.name}}
-                            </p>
-                            <p>
-                                {{filter_form.release_year.label}}
-                                {{filter_form.release_year}}
-                            </p>
-                            <p>
-                                {{filter_form.rating.label}}
-                                {{filter_form.rating}}
-                            </p>
-                            <p>
-                                {{filter_form.filter_genres.label}}
-                                {{filter_form.filter_genres}}
-                            </p>
-                            <p>
-                                {{filter_form.filter_countries.label}}
-                                {{filter_form.filter_countries}}
-                            </p>
-                            <p>
-                                {{filter_form.filter_years.label}}
-                                {{filter_form.filter_years}}
-                            </p>
-                            <p>
-                                {{filter_form.filter_rating.label}}
-                                {{filter_form.filter_rating}}
-                            </p>
-                        </div>
-                        <button type="submit" class="btn btn-sm btn-primary btn-raised mr-3">Фильтровать</button>
-                    </form>
-                    {% comment %} <form method="get"> {% endcomment %}
-                        {% comment %} {{rating_form}} {% endcomment %}
-                        {% comment %} <button type="submit" class="btn btn-sm btn-primary btn-raised mr-3">Найти</button> {% endcomment %}
-                    {% comment %} </form> {% endcomment %}
-                    {% comment %} <form action="{% url 'movies:filter' %}" method="get"> {% endcomment %}
-                        {% comment %} {% include 'includes/filter_genre.html' %} {% endcomment %}
-                        {% comment %} {% include 'includes/filter_year.html' %} {% endcomment %}
-                        {% comment %} {% include 'includes/rating.html' %} {% endcomment %}
-                        {% comment %} <button type="submit" class="btn btn-sm btn-primary btn-raised mr-3">Найти</button> {% endcomment %}
-                    {% comment %} </form> {% endcomment %}
-                    {% get_last_movies count=5 %}
-                </div>
+                {% include 'movies/includes/sidebar_movies.html' %}
                 <div class="left-ads-display col-lg-9">
-                    Всего фильмов: {{object_list|length}}
-                    {% comment %} <form method="get" name="filter"> {% endcomment %}
-                        {% comment %} <button type="submit" class="btn btn-sm btn-primary btn-raised mr-3">Сортировать</button>
-                        {{filter_form.name}}
-                        {{filter_form.release_year}}
-                        {{filter_form.rating}} {% endcomment %}
-                    {% comment %} </form> {% endcomment %}
+                    Всего фильмов: {{paginator.count}}
                     <div class="row">
-                        {% for movie in object_list %}
-                        <div class="col-md-4 product-men">
-                            <div class="product-shoe-info editContent text-center mt-lg-4" >
-                                <div class="men-thumb-item">
-                                    {% thumbnail movie.poster "390x450" crop="center" as poster %}
-                                        <img src="{{poster.url}}"alt="" width="{{poster.width}}" height="{{poster.height}}">
-                                    {% endthumbnail %}
-                                </div>
-                                <div class="item-info-product">
-                                    <h4 class="">
-                                        <a href="{{movie.get_absolute_url}}" class="editContent" >{{movie.name}}({{movie.release_year}})</a>
-                                    </h4>
-                                    Рейтинг: {{movie.rating}}
-                                </div>
-                            </div>
-                        </div>
-                        {% endfor %}
+                        {% include 'movies/includes/movie_objects.html' %}
+                        {% include 'includes/paginator.html' %}
                     </div>
-                    <!--<div class="grid-img-right mt-4 text-right bg bg1" >
-                        <span class="money editContent" >Flat 50% Off</span>
-                        <a href="moviesingle.html" class="btn" >Now</a>
-                    </div>-->
                 </div>
             </div>
         </div>

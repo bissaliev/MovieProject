@@ -1,5 +1,5 @@
 from django import template
-from ..models import Category, Movie, ContentType, LikeDislike
+from ..models import Category, Movie, ContentType, LikeDislike, Bookmark
 
 register = template.Library()
 
@@ -24,7 +24,36 @@ def get_status_vote(obj, user):
     return vote
 
 
+@register.simple_tag()
+def bookmark_is_exists(obj, user):
+    content_type = ContentType.objects.get_for_model(obj)
+    try:
+        Bookmark.objects.get(
+            user=user,
+            content_type=content_type,
+            object_id=obj.id
+        )
+    except Bookmark.DoesNotExist:
+        return False
+    return True
+
+
 @register.inclusion_tag("movies/tags/last_movies.html")
 def get_last_movies(count=5):
     movies = Movie.objects.all().order_by("-id")[:count]
     return {"last_movies": movies}
+
+
+@register.simple_tag(takes_context=True)
+def param_replace(context, **kwargs):
+    d = context['request'].GET.copy()
+    for k, v in kwargs.items():
+        d[k] = v
+    for k in [k for k, v in d.items() if not v]:
+        del d[k]
+    return d.urlencode()
+
+
+@register.filter
+def addclass(field, css):
+    return field.as_widget(attrs={'class': css})

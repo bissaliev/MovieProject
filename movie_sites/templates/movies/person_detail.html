@@ -19,7 +19,7 @@
                 <li style="list-style: none"><span><b>Дата рождения:</b> {{object.birthdate}} </span></li>
                 <li style="list-style: none"><span><b>Возраст:</b> {{object.get_age}} </span></li>
                 <li style="list-style: none"><span><b>Страна:</b> {{object.country}}</span></li>
-                <li style="list-style: none"><span><b>Пол:</b> {{object.gender}} </span></li>
+                <li style="list-style: none"><span><b>Пол:</b> {{object.get_gender_display}} </span></li>
                 <li style="list-style: none">
                     <p>
                         Рейтинг: {{object.get_like_rating}}
@@ -43,6 +43,20 @@
                             {{object.get_dislike_count}}
                         </a>
                     {% endif %}
+                </li>
+                <li style="list-style: none">
+                    <div class="sub-para-w3layouts mt-2">
+                        {% if user.is_authenticated %}
+                        {% bookmark_is_exists object user as bookmark %}
+                            <a class="btn btn-primary" href="{% url 'movies:add_bookmark_person' object.id %}">
+                                {% if bookmark %}
+                                    <img style="width: 30px; height: 30px;" src="{% static 'img/bookmark_is.svg' %}" alt="За стеклом">
+                                {% else %}
+                                    <img style="width: 30px; height: 30px;" src="{% static 'img/bookmark_not.svg' %}" alt="За стеклом">
+                                {% endif%}
+                            </a>
+                        {% endif %}
+                    </div>
                 </li>
                 <li style="list-style: none">
                     <div class="row sub-para-w3layouts mt-5">
