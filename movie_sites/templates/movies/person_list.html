@@ -3,11 +3,11 @@
 {% load movie_tag %}
 {% block title %}{{title}}{% endblock title %}
 {% block content %}
-        <section class="ab-info-main py-md-5 py-4 editContent" style="padding-left: 3rem; padding-right: 3rem;">
+        <section class="py-md-5 py-4" style="padding-left: 3rem; padding-right: 3rem;">
             <div class="container-fluid py-md-3">
                 <div class="row">
                     {% include 'movies/includes/sidebar_persons.html' %}
-                    <div class="left-ads-display col-lg-9">
+                    <div class="col-lg-9">
                         Всего: {{paginator.count}}
                         <div class="row">
                             {% include 'movies/includes/person_objects.html' %}
@@ -19,18 +19,3 @@
         </section>
 </body>
 {% endblock %}
-{% comment %} {% extends 'base.html' %} {% endcomment %}
-{% comment %} {% block title %}{{title}}{% endblock title %} {% endcomment %}
-{% comment %} {% block content %} {% endcomment %}
-    {% comment %} {% for obj in object_list %} {% endcomment %}
-        {% comment %} <div> {% endcomment %}
-            {% comment %} {% if obj.picture %} {% endcomment %}
-                {% comment %} <img src="{{obj.picture.url}}" width="300" height="300"> {% endcomment %}
-            {% comment %} {% endif %} {% endcomment %}
-            {% comment %} <p>{{obj.first_name}} {{obj.last_name}} </p> {% endcomment %}
-            {% comment %} <p>{{obj.birthdate}}</p> {% endcomment %}
-            {% comment %} <p><a href="{{obj.get_absolute_url}}">Подробнее</a></p> {% endcomment %}
-        {% comment %} </div> {% endcomment %}
-    {% comment %} {% endfor %} {% endcomment %}
-{% comment %} {% endblock %} {% endcomment %}
-{% comment %}  {% endcomment %}

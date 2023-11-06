@@ -1,11 +1,11 @@
 {% extends 'base.html' %}
 {% block title %}{{title}}{% endblock title %}
 {% block content %}
-    <section class="ab-info-main py-md-5 py-4 editContent" style="padding-left: 3rem; padding-right: 3rem;">
+    <section class="py-md-5 py-4" style="padding-left: 3rem; padding-right: 3rem;">
         <div class="container-fluid py-md-3">
             <div class="row">
                 {% include 'movies/includes/sidebar_movies.html' %}
-                <div class="left-ads-display col-lg-9">
+                <div class="col-lg-9">
                     Всего фильмов: {{paginator.count}}
                     <div class="row">
                         {% include 'movies/includes/movie_objects.html' %}

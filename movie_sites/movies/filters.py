@@ -7,6 +7,12 @@ from .forms import FilterPersonForm, FilterMovieForm
 
 
 class FilterOrderPersonMixin:
+    """
+    Миксин для фильтрации персон по профилю(режиссер или актер), полу;
+    поиск персон по фамилии и имени;
+    сортировка по имени(А-Я, Я-А), по дате рождения(на убывание и возрастание).
+    """
+
     def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
         context = super().get_context_data(**kwargs)
         context["filter_form"] = FilterPersonForm(self.request.GET)
@@ -35,6 +41,12 @@ class FilterOrderPersonMixin:
 
 
 class FilterOrderMovieMixin:
+    """
+    Миксин для фильтрации по жанрам, рейтингу на сайте, странам, году создания;
+    поиск по названию;
+    сортировка по названию(А-Я, Я-А), рейтингу(На убывание и возрастание),
+    году производства(На возрастание и убывание).
+    """
     def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
         context = super().get_context_data(**kwargs)
         context["filter_form"] = FilterMovieForm(self.request.GET)
@@ -62,6 +74,11 @@ class FilterOrderMovieMixin:
 
 
 class FilterOrderMultipleMixin:
+    """
+    Миксин для динамического определения фильтра для персон или фильмов
+    (FilterOrderPersonMixin, FilterOrderMovieMixin) для класса представления
+    BookmarkListView.
+    """
 
     def get(self, request, *args, **kwargs):
         if self.model == Person:

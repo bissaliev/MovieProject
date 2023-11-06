@@ -1,7 +1,6 @@
 from django.urls import path
 from .views import (
     CategoryCreateView,
-    # CategoryDetailView,
     CategoryListView,
     PersonListView,
     PersonCreateView,
@@ -20,12 +19,9 @@ from .views import (
     LikeDislikeView,
     MovieCategoriesView,
     AddBookmarkView,
-    BookmarkListView,
-    BookmarkMainListView
-    # ProfileView
+    BookmarkListView
 )
 from .models import Comment, Person, Movie
-from .filters import FilterOrderMovieMixin
 
 app_name = "movies"
 
@@ -91,11 +87,6 @@ urlpatterns = [
         AddBookmarkView.as_view(model=Movie),
         name="add_bookmark_movie"
         ),
-    path(
-        "bookmarks/",
-        BookmarkMainListView.as_view(),
-        name="bookmarks"
-    ),
     path(
         "bookmark/persons",
         BookmarkListView.as_view(

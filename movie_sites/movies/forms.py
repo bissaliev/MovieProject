@@ -12,8 +12,7 @@ from .models import (
 
 
 class CommentForm(forms.ModelForm):
-    """Форма комментариев."""
-    # captcha = ReCaptchaField()
+    """Форма для комментариев."""
 
     class Meta:
         model = Comment
@@ -26,30 +25,38 @@ class CommentForm(forms.ModelForm):
 
 
 class PersonForm(forms.ModelForm):
+    """Форма для создания персоны."""
+
     class Meta:
         model = Person
         fields = "__all__"
 
 
 class CategoryForm(forms.ModelForm):
+    """Форма для создания категории."""
+
     class Meta:
         model = Category
         fields = "__all__"
 
 
 class GenreForm(forms.ModelForm):
+    """Форма для создания жанра."""
+
     class Meta:
         model = Genre
         fields = "__all__"
 
 
 class CountryForm(forms.ModelForm):
+    """Форма для создания страны."""
     class Meta:
         model = Country
         fields = "__all__"
 
 
 class MovieForm(forms.ModelForm):
+    """Форма для создания фильма."""
     class Meta:
         model = Movie
         fields = "__all__"
@@ -63,6 +70,7 @@ class MovieActorForm(forms.ModelForm):
 
 
 class RatingForm(forms.ModelForm):
+    """Форма для добавление рейтинга на определенный фильм."""
 
     class Meta:
         model = Rating
@@ -70,6 +78,8 @@ class RatingForm(forms.ModelForm):
 
 
 class FilterMovieForm(forms.Form):
+    """Форма для отображения полей для фильтрации, сортировки и поиску фильмов."""
+
     CHOICE_YEARS = [
         (i, i) for i in sorted(list(set(
             Movie.objects.values_list("release_year", flat=True)
@@ -127,6 +137,8 @@ MovieFormSet = forms.inlineformset_factory(
 
 
 class FilterPersonForm(forms.Form):
+    """Форма для отображения полей для фильтрации, сортировки и поиску персон."""
+
     PERSON_PROFILE_CHOICES = [
         ("actors", "Актеры"),
         ("directors", "Режиссеры"),

@@ -4,7 +4,7 @@
 {% load static %}
 {% block title %}Главная страница{% endblock title %}
 {% block content %}
-<div class="left-ads-display py-md-5 py-4 margin-top:10px" style="margin-top:10px">
+<div class="py-md-5 py-4 margin-top:10px" style="margin-top:10px">
     <div class="row">
         <div class="desc1-left col-md-4">
             {% thumbnail object.poster "600x800" crop="center" as poster %}
@@ -12,12 +12,10 @@
             {% endthumbnail %}
         </div>
         <div class="desc1-right col-md-8 pl-lg-4">
-            <h3 class="editContent" style="outline: none; cursor: inherit;">{{object.name}}</h3>
+            <h3>{{object.name}}</h3>
             <ul>
                 <li style="list-style: none"><span><b>Год:</b> {{object.release_year}} </span></li>
                 <li style="list-style: none"><span><b>Страна:</b> {{ object.countries.all|join:', ' }}</span>
-                </li>
-                <li style="list-style: none"><span><b>Слоган:</b> «Welcome to the Day after Judgment Day»</span>
                 </li>
                 <li class="row py-4" style="list-style: none"><b>Режиссер:</b> 
                     {% for director in object.directors.all %}
@@ -48,33 +46,9 @@
                         {{ object.genres.all|join:', ' }}
                     </span>
                 </li>
-                <li style="list-style: none"><span><b>Премьера в мире:</b> 23 октября 2019</span>
-                </li>
-                <li style="list-style: none">
-                    <span><b>Бюджет:</b> $185 000 000</span></li>
-                <li style="list-style: none">
-                    <span><b>Сборы в США:</b> $61 150 256</span></li>
-                <li style="list-style: none"><span><b>Сборы в мире:</b> $250 369 693</span>
-                </li>
                 <li style="list-style: none; padding-left: 10px;">
                     <div>
                         <p><h3>Рейтинг: {{object.rating}}</h3></p>
-                        {% comment %} <form action="{% url 'movies:add_rating' %}" method="post" name="rating">
-                            <div class="full-stars">
-                                <div class="rating-group">
-                                    {% csrf_token %}
-                                    <input type="hidden" value="{{object.id}}" name="movie">
-                                    {% for k, v in ratung_form.fields.score.choices %}
-                                        <div class="form-check form-check-inline px-1 mx-1">
-                                            <label for="rating{{ v }}">
-                                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512"><path d="M259.3 17.8L194 150.2 47.9 171.5c-26.2 3.8-36.7 36.1-17.7 54.6l105.7 103-25 145.5c-4.5 26.3 23.2 46 46.4 33.7L288 439.6l130.7 68.7c23.2 12.2 50.9-7.4 46.4-33.7l-25-145.5 105.7-103c19-18.5 8.5-50.8-17.7-54.6L382 150.2 316.7 17.8c-11.7-23.6-45.6-23.9-57.4 0z"/></svg>
-                                            </label>
-                                            <input class="form-check-inline" id="rating{{ v }}" type="radio" name="score" value="{{ k }}">
-                                        </div>
-                                    {% endfor %}
-                                </div>
-                            </div>
-                        </form> {% endcomment %}
                         <form action="{% url 'movies:add_rating' %}" method="post" name="rating">
                             {% csrf_token %}
                             <input type="hidden" value="{{object.id}}" name="movie">
@@ -83,7 +57,7 @@
                     </div>
                 </li>
                 <li style="list-style: none">
-                    <div class="sub-para-w3layouts mt-2">
+                    <div class="mt-2">
                         {% if user.is_authenticated %}
                         {% bookmark_is_exists object user as bookmark %}
                             <a class="btn btn-primary" href="{% url 'movies:add_bookmark_movie' object.id %}">
@@ -97,17 +71,16 @@
                     </div>
                 </li>
                 <li style="list-style: none">
-                    <h3 class="shop-sing editContent" style="outline: none; cursor: inherit;">
+                    <h3 class="shop-sing">
                         О фильме {{object.name }}</h3>
-                    <p class="editContent" style="outline: none; cursor: inherit;">
+                    <p>
                         {{object.description|linebreaks }}
                     </p>
                 </li>
             </ul>
                 <div class="share-desc">
                     <div class="share">
-                        <h4 class="editContent"
-                            style="outline: none; cursor: inherit;">
+                        <h4>
                             Share:</h4>
                         <ul class="w3layouts_social_list list-unstyled">
                             <li>
@@ -133,7 +106,6 @@
                             </li>
                         </ul>
                     </div>
-                    <div class="clearfix"></div>
                 </div>
         </div>
     </div>

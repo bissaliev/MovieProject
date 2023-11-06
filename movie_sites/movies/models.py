@@ -219,6 +219,10 @@ class Movie(models.Model):
 
 
 class MovieActor(models.Model):
+    """
+    Промежуточная модель для фильмов и актеров дополнительным полем role
+    (роль в фильме).
+    """
     movie = models.ForeignKey(
         to="Movie",
         on_delete=models.CASCADE,
@@ -341,16 +345,8 @@ class LikeDislike(models.Model):
         return f"{self.user} - {self.content_type}: ({self.vote})"
 
 
-class BookmarksManager(models.Manager):
-    use_for_related_fields = True
-
-    def get_bookmark_defined_model(self, model: str, user):
-        return self.get_queryset().filter(
-            content_type__model=model, user=user
-        )
-
-
 class Bookmark(models.Model):
+    """Закладки."""
     user = models.ForeignKey(
         to=User,
         on_delete=models.CASCADE,
@@ -372,28 +368,3 @@ class Bookmark(models.Model):
 
     def __str__(self):
         return f"{self.user} - {self.content_type}"
-
-
-# class LikeDislikeManager(models.Manager):
-#     """Менеджер для модели LikeDislike."""
-
-#     use_for_related_fields = True
-
-#     def likes(self):
-#         """Получаем лайки."""
-#         return self.get_queryset().filter(vote__gt=0)
-
-#     def dislikes(self):
-#         """Получаем дизлайки."""
-#         return self.get_queryset().filter(vote__lt=0)
-
-#     def sum_rating(self):
-#         """Получаем общую сумму."""
-#         return self.get_queryset().aggregate(Sum("vote")).get("vote__sum") or 0
-
-#     def comments(self):
-#         """Получаем голоса для модели Comment."""
-#         return self.get_queryset().filter(
-#             content_type__model="comment"
-#         ).order_by("-comments__pub_date")
-

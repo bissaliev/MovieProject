@@ -1,11 +1,10 @@
-from collections.abc import Sequence
 from typing import Any
 from django.contrib import messages
 from django.db.models import Avg
 from django.db.models.query import QuerySet
 from django.contrib.contenttypes.models import ContentType
 from django.http import HttpResponse
-from django.shortcuts import redirect, render
+from django.shortcuts import redirect
 from .models import (
     Person,
     Category,
@@ -27,10 +26,14 @@ from .forms import (
     MovieFormSet
 )
 from .utils import get_ip
-from .filters import FilterOrderPersonMixin, FilterOrderMovieMixin, FilterOrderMultipleMixin
+from .filters import (
+    FilterOrderPersonMixin,
+    FilterOrderMovieMixin,
+    FilterOrderMultipleMixin
+)
 from django.views.generic import ListView, CreateView, DetailView
 from django.urls import reverse_lazy
-from django.views.generic.base import View, TemplateView
+from django.views.generic.base import View
 
 
 class MovieCreateView(CreateView):
@@ -73,7 +76,7 @@ class MovieCreateView(CreateView):
 
 
 class PersonListView(FilterOrderPersonMixin, ListView):
-    """Список персон."""
+    """Возвращает список персон."""
     model = Person
     template_name = "movies/person_list.html"
     paginate_by = 6
@@ -89,7 +92,7 @@ class PersonCreateView(CreateView):
 
 
 class PersonDetailView(DetailView):
-    """Персона."""
+    """Возвращает определенную по id персону."""
     model = Person
     template_name = "movies/person_detail.html"
     extra_context = {"title": "Детальная информация"}
@@ -97,7 +100,7 @@ class PersonDetailView(DetailView):
 
 
 class MovieListView(FilterOrderMovieMixin, ListView):
-    """Список фильмов."""
+    """Возвращает список фильмов."""
     model = Movie
     template_name = "movies/movies.html"
     paginate_by = 6
@@ -105,7 +108,7 @@ class MovieListView(FilterOrderMovieMixin, ListView):
 
 
 class MovieDetailView(DetailView):
-    """Фильм."""
+    """Возвращает определенный по id фильм."""
     model = Movie
     template_name = "movies/movie_detail.html"
     extra_context = {"title": "Фильм"}
@@ -123,7 +126,7 @@ class MovieDetailView(DetailView):
 
 
 class AddComment(View):
-    """Добавление комментариев."""
+    """Добавление комментария."""
 
     def post(self, request, pk):
         form = CommentForm(request.POST)
@@ -138,7 +141,7 @@ class AddComment(View):
 
 
 class AddRating(View):
-    """Добавление рейтинга."""
+    """Добавление рейтинга фильму."""
 
     def post(self, request):
         form = RatingForm(request.POST)
@@ -158,14 +161,14 @@ class AddRating(View):
 
 
 class CountryListView(ListView):
-    """Список стран."""
+    """Возвращает список стран."""
     model = Country
     template_name = "movies/category_list.html"
     extra_context = {"title": "Страны"}
 
 
 class CountryDetailView(DetailView):
-    """Страна."""
+    """Возвращает определенную по slug страну."""
     model = Country
     template_name = "movies/category_detail.html"
     extra_context = {"title": "Страна"}
@@ -181,14 +184,14 @@ class CountryCreateView(CreateView):
 
 
 class GenreListView(ListView):
-    """Список жанров."""
+    """Возвращает список жанров."""
     model = Genre
     template_name = "movies/category_list.html"
     extra_context = {"title": "Жанры"}
 
 
 class GenreDetailView(DetailView):
-    """Жанр."""
+    """Возвращает определенный по slug жанр."""
     model = Genre
     template_name = "movies/category_detail.html"
     extra_context = {"title": "Жанр"}
@@ -203,14 +206,14 @@ class GenreCreateView(CreateView):
 
 
 class CategoryListView(ListView):
-    """Список категорий."""
+    """Возвращает список категорий."""
     model = Category
     template_name = "movies/category_list.html"
     extra_context = {"title": "Категории"}
 
 
 class CategoryDetailView(DetailView):
-    """категория."""
+    """Возвращает определенную по slug категорию."""
     model = Category
     template_name = "movies/movies.html"
     slug_url_kwarg = "category_slug"
@@ -218,6 +221,7 @@ class CategoryDetailView(DetailView):
 
 
 class MovieCategoriesView(FilterOrderMovieMixin, ListView):
+    """Возвращает список фильмов по определенной категории."""
     model = Movie
     template_name = "movies/movies.html"
     paginate_by = 6
@@ -236,6 +240,10 @@ class CategoryCreateView(CreateView):
 
 
 class LikeDislikeView(View):
+    """
+    Создание лайков и дизлайков на определенный контент,
+    а также их удаление.
+    """
     model = None
 
     def get(self, request, pk, vote):
@@ -259,6 +267,7 @@ class LikeDislikeView(View):
 
 
 class AddBookmarkView(View):
+    """Добавление закладки на определенный контент, а также её удаление."""
     model = None
 
     def get(self, request, pk):
@@ -273,25 +282,13 @@ class AddBookmarkView(View):
 
 
 class BookmarkListView(FilterOrderMultipleMixin, ListView):
+    """
+    Возвращает список объектов определенной модели,
+    находящихся в закладках у определенного авторизированного пользователя.
+    """
     model = None
     template_name = None
     paginate_by = 6
 
     def get_queryset(self) -> QuerySet[Any]:
         return super().get_queryset().filter(bookmarks__user=self.request.user)
-
-
-class BookmarkMainListView(TemplateView):
-    models = [Person, Movie]
-    template_name = "movies/bookmark_list.html"
-
-    def get(self, request, *args, **kwargs):
-        bookmarks = {}
-        for model in self.models:
-            bookmarks[model.__name__.lower()] = model.objects.filter(
-                bookmarks__user=request.user
-            )[:5]
-
-        context = self.get_context_data(**kwargs)
-        context["bookmarks"] = bookmarks
-        return self.render_to_response(context)

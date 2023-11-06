@@ -2,18 +2,9 @@
 {% load movie_tag %}
 {% load thumbnail %}
 <div class="col-lg-3">
-    {% comment %} <div class="w3layouts-newsletter m-3"> {% endcomment %}
-        {% comment %} <h3 class="sear-head editContent" >Поиск актера</h3> {% endcomment %}
-        {% comment %} <form action="{% url 'movies:search_person' %}" method="get" class="d-flex editContent" > {% endcomment %}
-            {% comment %} <input type="search" placeholder="Введите имя актера..." name="search" class="form-control" required=""> {% endcomment %}
-            {% comment %} <button class="btn btn-primary" > {% endcomment %}
-                {% comment %} <img src="{% static 'img/search.svg' %}" alt="" style="width: 30px; height: 30px;"> {% endcomment %}
-            {% comment %} </button> {% endcomment %}
-        {% comment %} </form> {% endcomment %}
-    {% comment %} </div> {% endcomment %}
     <form method="get">
-        <div class="w3layouts-newsletter m-3">
-            <h3 class="sear-head editContent" >Поиск актера</h3>
+        <div class="m-3">
+            <h3 class="sear-head" >Поиск актера</h3>
             {{filter_form.search.label}}
             {{filter_form.search}}
             <button class="btn btn-primary" >

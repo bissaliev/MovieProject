@@ -2,9 +2,9 @@
 {% load movie_tag %}
 {% load static %}
 {% for obj in object_list %}
-<div class="col-md-4 product-men">
-    <div class="product-shoe-info editContent text-center mt-lg-4" >
-        <div class="men-thumb-item" style="position: relative;">
+<div class="col-md-4">
+    <div class="product-shoe-info text-center mt-lg-4" >
+        <div style="position: relative;">
             {% thumbnail obj.picture "400x400" crop="center" as picture %}
                 <img src="{{picture.url}}"alt="" width="{{picture.width}}" height="{{picture.height}}">
             {% endthumbnail %}
@@ -22,8 +22,8 @@
             </div>
         </div>
         <div class="item-info-product">
-            <h4 class="">
-                <a href="{{obj.get_absolute_url}}" class="editContent" >{{obj.first_name}} {{obj.last_name}}</a>
+            <h4>
+                <a href="{{obj.get_absolute_url}}">{{obj.first_name}} {{obj.last_name}}</a>
             </h4>
         </div>
     </div>

@@ -2,9 +2,9 @@
 {% load movie_tag %}
 {% load static %}
 {% for movie in object_list %}
-<div class="col-md-4 product-men">
-    <div class="product-shoe-info editContent text-center mt-lg-4" >
-        <div class="men-thumb-item" style="position: relative;">
+<div class="col-md-4">
+    <div class="product-shoe-info text-center mt-lg-4" >
+        <div style="position: relative;">
             {% thumbnail movie.poster "390x450" crop="center" as poster %}
                 <img src="{{poster.url}}"alt="" width="{{poster.width}}" height="{{poster.height}}">
             {% endthumbnail %}
@@ -23,8 +23,8 @@
         </div>
         <div class="item-info-product">
             <div>
-                <h4 class="">
-                    <a href="{{movie.get_absolute_url}}" class="editContent" >{{movie.name}}({{movie.release_year}})</a>
+                <h4>
+                    <a href="{{movie.get_absolute_url}}">{{movie.name}}({{movie.release_year}})</a>
                 </h4>
                 Рейтинг: {{movie.rating}}
             </div>
