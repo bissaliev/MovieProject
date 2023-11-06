@@ -1,7 +1,6 @@
 from django import forms
 from .models import (
     Person,
-    Category,
     Genre,
     Country,
     Movie,
@@ -29,29 +28,6 @@ class PersonForm(forms.ModelForm):
 
     class Meta:
         model = Person
-        fields = "__all__"
-
-
-class CategoryForm(forms.ModelForm):
-    """Форма для создания категории."""
-
-    class Meta:
-        model = Category
-        fields = "__all__"
-
-
-class GenreForm(forms.ModelForm):
-    """Форма для создания жанра."""
-
-    class Meta:
-        model = Genre
-        fields = "__all__"
-
-
-class CountryForm(forms.ModelForm):
-    """Форма для создания страны."""
-    class Meta:
-        model = Country
         fields = "__all__"
 
 

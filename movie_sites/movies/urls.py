@@ -1,16 +1,8 @@
 from django.urls import path
 from .views import (
-    CategoryCreateView,
-    CategoryListView,
     PersonListView,
     PersonCreateView,
     PersonDetailView,
-    GenreListView,
-    GenreDetailView,
-    GenreCreateView,
-    CountryListView,
-    CountryDetailView,
-    CountryCreateView,
     MovieListView,
     MovieDetailView,
     MovieCreateView,
@@ -40,30 +32,10 @@ urlpatterns = [
         PersonDetailView.as_view(),
         name="person_detail"
     ),
-    path("categories/", CategoryListView.as_view(), name="category_list"),
     path(
         "category/<slug:category_slug>",
         MovieCategoriesView.as_view(),
         name="movie_categories"
-    ),
-    path(
-        "category/create/",
-        CategoryCreateView.as_view(),
-        name="category_create"
-    ),
-    path("genres/", GenreListView.as_view(), name="genre_list"),
-    path("genre/<slug:slug>", GenreDetailView.as_view(), name="genre_detail"),
-    path("genre/create/", GenreCreateView.as_view(), name="genre_create"),
-    path("countries/", CountryListView.as_view(), name="country_list"),
-    path(
-        "country/<int:country_id>",
-        CountryDetailView.as_view(),
-        name="country_detail"
-    ),
-    path(
-        "country/create/",
-        CountryCreateView.as_view(),
-        name="country_create"
     ),
     path("comment/<int:pk>/", AddComment.as_view(), name="add_comment"),
     path("add_rating/", AddRating.as_view(), name="add_rating"),

@@ -7,9 +7,6 @@ from django.http import HttpResponse
 from django.shortcuts import redirect
 from .models import (
     Person,
-    Category,
-    Genre,
-    Country,
     Movie,
     Rating,
     LikeDislike,
@@ -17,9 +14,6 @@ from .models import (
 )
 from .forms import (
     PersonForm,
-    CategoryForm,
-    GenreForm,
-    CountryForm,
     MovieForm,
     CommentForm,
     RatingForm,
@@ -160,66 +154,6 @@ class AddRating(View):
         return HttpResponse(status=400)
 
 
-class CountryListView(ListView):
-    """Возвращает список стран."""
-    model = Country
-    template_name = "movies/category_list.html"
-    extra_context = {"title": "Страны"}
-
-
-class CountryDetailView(DetailView):
-    """Возвращает определенную по slug страну."""
-    model = Country
-    template_name = "movies/category_detail.html"
-    extra_context = {"title": "Страна"}
-    pk_url_kwarg = "country_id"
-
-
-class CountryCreateView(CreateView):
-    """Создание страны."""
-    form_class = CountryForm
-    template_name = "movies/country_create.html"
-    success_url = reverse_lazy("movies:country_list")
-    extra_context = {"title": "Создание новой страны"}
-
-
-class GenreListView(ListView):
-    """Возвращает список жанров."""
-    model = Genre
-    template_name = "movies/category_list.html"
-    extra_context = {"title": "Жанры"}
-
-
-class GenreDetailView(DetailView):
-    """Возвращает определенный по slug жанр."""
-    model = Genre
-    template_name = "movies/category_detail.html"
-    extra_context = {"title": "Жанр"}
-
-
-class GenreCreateView(CreateView):
-    """Создание жанра."""
-    form_class = GenreForm
-    template_name = "movies/category_create.html"
-    success_url = reverse_lazy("movies:genre_list")
-    extra_context = {"title": "Создание нового жанра"}
-
-
-class CategoryListView(ListView):
-    """Возвращает список категорий."""
-    model = Category
-    template_name = "movies/category_list.html"
-    extra_context = {"title": "Категории"}
-
-
-class CategoryDetailView(DetailView):
-    """Возвращает определенную по slug категорию."""
-    model = Category
-    template_name = "movies/movies.html"
-    slug_url_kwarg = "category_slug"
-    extra_context = {"title": "Категория"}
-
-
 class MovieCategoriesView(FilterOrderMovieMixin, ListView):
     """Возвращает список фильмов по определенной категории."""
     model = Movie
@@ -229,14 +163,6 @@ class MovieCategoriesView(FilterOrderMovieMixin, ListView):
     def get_queryset(self) -> QuerySet[Any]:
         category_slug = self.kwargs["category_slug"]
         return super().get_queryset().filter(category__slug=category_slug)
-
-
-class CategoryCreateView(CreateView):
-    """Создание категории."""
-    form_class = CategoryForm
-    template_name = "movies/category_create.html"
-    success_url = reverse_lazy("movies:category_list")
-    extra_context = {"title": "Создание новой категории"}
 
 
 class LikeDislikeView(View):
