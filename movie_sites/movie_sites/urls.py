@@ -7,6 +7,7 @@ urlpatterns = [
     path('', include('movies.urls', namespace='movies')),
     path("auth/", include("users.urls", namespace="users")),
     path("auth/", include("django.contrib.auth.urls")),
+    path("api/v1/", include("api_movie.urls", namespace="api")),
     path("admin/", admin.site.urls),
 ]
 

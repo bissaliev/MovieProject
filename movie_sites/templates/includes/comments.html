@@ -60,7 +60,7 @@
                     {{comment.get_dislike_count}}
                 </a>
             {% endif %}
-            {% for com in comment.majors.all %}
+            {% for com in comment.children.all %}
             <div class="mt-1 px-5" style="border: 1px solid black;">
                 {% comment %} <a class="pr-3" href="#"> {% endcomment %}
                     {% comment %} <img src="#" class="img-fluid" alt="image"> {% endcomment %}

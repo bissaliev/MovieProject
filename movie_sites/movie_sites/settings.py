@@ -1,3 +1,4 @@
+from datetime import timedelta
 import os
 
 from pathlib import Path
@@ -15,6 +16,7 @@ DEBUG = True
 ALLOWED_HOSTS = [
     "127.0.0.1",
     "testserver",
+    "*"
 ]
 
 INTERNAL_IPS = [
@@ -33,6 +35,8 @@ INSTALLED_APPS = [
     "movies.apps.MoviesConfig",
     "users.apps.UsersConfig",
     "sorl.thumbnail",
+    "rest_framework",
+    "djoser",
     "debug_toolbar",
 ]
 
@@ -87,13 +91,13 @@ DATABASES = {
 
 AUTH_PASSWORD_VALIDATORS = [
     {
-        "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",
+        "name": "django.contrib.auth.password_validation.userattributesimilarityvalidator",
     },
     {
-        "NAME": "django.contrib.auth.password_validation.MinimumLengthValidator",
+        "name": "django.contrib.auth.password_validation.minimumlengthvalidator",
     },
     {
-        "NAME": "django.contrib.auth.password_validation.CommonPasswordValidator",
+        "name": "django.contrib.auth.password_validation.commonpasswordvalidator",
     },
     {
         "NAME": "django.contrib.auth.password_validation.NumericPasswordValidator",
@@ -129,3 +133,17 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 LOGIN_URL = "auth/login"
 LOGIN_REDIRECT_URL = "/"
+
+REST_FRAMEWORK = {
+    "DEFAULT_PERMISSION_CLASSES": [
+        "rest_framework.permissions.IsAuthenticatedOrReadOnly"
+    ],
+    "DEFAULT_AUTHENTICATION_CLASSES": [
+        "rest_framework_simplejwt.authentication.JWTAuthentication"
+    ]
+}
+
+SIMPLE_JWT = {
+    "ACCESS_TOKEN_LIFETIME": timedelta(days=10),
+    "AUTH_HEADER_TYPES": ("Bearer",),
+}

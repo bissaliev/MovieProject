@@ -80,6 +80,7 @@ class Person(models.Model):
     def get_absolute_url(self):
         return reverse("movies:person_detail", kwargs={"person_id": self.id})
 
+    @property
     def get_age(self):
         today = timezone.now().date()
         age = today.year - self.birthdate.year
@@ -95,6 +96,7 @@ class Person(models.Model):
     def get_dislike_count(self):
         return self.votes.filter(vote__lt=0).count()
 
+    @property
     def get_like_rating(self):
         return self.votes.values(
             "vote").aggregate(Sum("vote")).get("vote__sum")
@@ -297,7 +299,7 @@ class Comment(models.Model):
         null=True,
         blank=True,
         verbose_name="Старший комментарий",
-        related_name="majors"
+        related_name="children"
     )
     pub_date = models.DateTimeField("Время публикации", auto_now_add=True)
     votes = GenericRelation(to="LikeDislike", related_query_name="comment")
