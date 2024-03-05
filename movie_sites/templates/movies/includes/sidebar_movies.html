@@ -1,39 +1,44 @@
 {% load static %}
 {% load movie_tag %}
 {% load thumbnail %}
-<div class="col-lg-3" style="background-color: dimgray;">
-    <form method="get" name="filter">
-        <div>
-            <p>
-                {{filter_form.search.label}}
-                {{filter_form.search}}
-                <button class="btn btn-primary" >
-                    <img src="{% static 'img/search.svg' %}" alt="" style="width: 30px; height: 30px;">
-                </button>
-            </p>
-            <button type="submit" class="btn btn-sm btn-primary btn-raised m-3">Сортировать</button>
-            <p>
-                {{filter_form.sort.label}}
-                {{filter_form.sort}}
-            </p>
-            <p>
-                {{filter_form.filter_genres.label}}
-                {{filter_form.filter_genres}}
-            </p>
-            <p>
-                {{filter_form.filter_countries.label}}
-                {{filter_form.filter_countries}}
-            </p>
-            <p>
-                {{filter_form.filter_years.label}}
-                {{filter_form.filter_years}}
-            </p>
-            <p>
-                {{filter_form.filter_rating.label}}
-                {{filter_form.filter_rating}}
-            </p>
-        </div>
-        <button type="submit" class="btn btn-sm btn-primary btn-raised mr-3">Фильтровать</button>
-    </form>
-    {% get_last_movies count=5 %}
-</div>
+<form method="get" name="filter">
+    <div>
+        <p>
+            {{filter_form.search.label}}
+            {{filter_form.search}}
+            <button class="btn btn-primary" >
+                <img src="{% static 'img/search.svg' %}" alt="" style="width: 30px; height: 30px;">
+            </button>
+        </p>
+
+        <button type="submit" class="btn btn-sm btn-primary btn-raised m-3">Сортировать</button>
+
+        <p>
+            {{filter_form.sort.label}}
+            {{filter_form.sort}}
+        </p>
+
+        <p>
+            {{filter_form.filter_genres.label}}
+            {{filter_form.filter_genres}}
+        </p>
+
+        <p>
+            {{filter_form.filter_countries.label}}
+            {{filter_form.filter_countries}}
+        </p>
+
+        <p>
+            {{filter_form.filter_years.label}}
+            {{filter_form.filter_years}}
+        </p>
+
+        <p>
+            {{filter_form.filter_rating.label}}
+            {{filter_form.filter_rating}}
+        </p>
+    </div>
+    
+    <button type="submit" class="btn btn-sm btn-primary btn-raised mr-3">Фильтровать</button>
+</form>
+{% get_last_movies count=5 %}

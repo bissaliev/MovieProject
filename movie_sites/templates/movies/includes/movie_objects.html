@@ -1,34 +1,45 @@
 {% load thumbnail %}
 {% load movie_tag %}
 {% load static %}
-{% for movie in object_list %}
-<div class="col-md-4">
-    <div class="product-shoe-info text-center mt-lg-4" >
-        <div style="position: relative;">
+<div class="row row-cols-1 row-cols-md-3 row-cols-lg-4 g-4 g-lg-4 ">
+
+    {% for movie in object_list %}
+
+    <div class="col">
+
+        <div class="card card_movie h-100">
+
             {% thumbnail movie.poster "390x450" crop="center" as poster %}
-                <img src="{{poster.url}}"alt="" width="{{poster.width}}" height="{{poster.height}}">
+                <img src="{{poster.url}}"alt="" width="{{poster.width}}" height="{{poster.height}}" class="card-img-top" alt="...">
             {% endthumbnail %}
-            <div style="position: absolute; bottom: 30px; right: 10px;">
-                {% if user.is_authenticated %}
-                    {% bookmark_is_exists movie user as bookmark %}
-                    <a class="btn btn-primary" href="{% url 'movies:add_bookmark_movie' movie.id %}">
-                        {% if bookmark %}
-                            <img style="width: 20px; height: 20px;" src="{% static 'img/bookmark_is.svg' %}" alt="За стеклом">
-                        {% else %}
-                            <img style="width: 20px; height: 20px;" src="{% static 'img/bookmark_not.svg' %}" alt="За стеклом">
-                        {% endif%}
-                    </a>
-                {% endif %}
+
+            <div class="card-body">
+                
+                <h5 class="card-title"><a href="{{movie.get_absolute_url}}">{{movie.name}}({{movie.release_year}})</a></h5>
+
+                <div class="d-flex justify-content-between">
+
+                    <p class="card-text">Рейтинг: {{movie.rating}}</p>
+
+                    {% if user.is_authenticated %}
+                        {% bookmark_is_exists movie user as bookmark %}
+                        <a class="btn btn-primary" href="{% url 'movies:add_bookmark_movie' movie.id %}">
+                            {% if bookmark %}
+                                <img style="width: 20px; height: 20px;" src="{% static 'img/bookmark_is.svg' %}" alt="За стеклом">
+                            {% else %}
+                                <img style="width: 20px; height: 20px;" src="{% static 'img/bookmark_not.svg' %}" alt="За стеклом">
+                            {% endif%}
+                        </a>
+                    {% endif %}
+
+                </div>
+
             </div>
+
         </div>
-        <div class="item-info-product">
-            <div>
-                <h4>
-                    <a href="{{movie.get_absolute_url}}">{{movie.name}}({{movie.release_year}})</a>
-                </h4>
-                Рейтинг: {{movie.rating}}
-            </div>
-        </div>
+
     </div>
+
+    {% endfor %}
+
 </div>
-{% endfor %}
