@@ -54,7 +54,9 @@ class RatingForm(forms.ModelForm):
 
 
 class FilterMovieForm(forms.Form):
-    """Форма для отображения полей для фильтрации, сортировки и поиску фильмов."""
+    """
+    Форма для отображения полей для фильтрации, сортировки и поиску фильмов.
+    """
 
     CHOICE_YEARS = [
         (i, i) for i in sorted(list(set(
