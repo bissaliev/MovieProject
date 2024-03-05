@@ -1,26 +1,28 @@
 {% extends 'base.html' %}
 {% block title %}{{title}}{% endblock title %}
 {% block content %}
-    <section class="py-md-5 py-4" style="padding-left: 3rem; padding-right: 3rem;">
+    <section class="mt-5 m-lg-5">
+
         <div class="container-fluid py-md-3">
-            <div class="row">
-                {% include 'movies/includes/sidebar_movies.html' %}
-                <div class="col-lg-9">
-                    Всего фильмов: {{paginator.count}}
-                    <div class="row">
-                        {% include 'movies/includes/movie_objects.html' %}
-                        {% include 'includes/paginator.html' %}
+
+                <button class="btn btn-primary mb-2" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasCart" aria-controls="offcanvasCart">
+                    Фильтрация
+                </button>
+
+                <div class="offcanvas offcanvas-start" tabindex="-1" id="offcanvasCart" aria-labelledby="offcanvasCartLabel">
+                    <div class="offcanvas-header">
+                        <h5 class="offcanvas-title" id="offcanvasCartLabel">Фильтрация</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+                    </div>
+                    <div class="offcanvas-body">
+                        {% include 'movies/includes/sidebar_movies.html' %}
                     </div>
                 </div>
-            </div>
+
+                <div>{% include 'movies/includes/movie_objects.html' %}</div>
+
+                <div class="pt-5">{% include 'includes/paginator.html' %}</div>
         </div>
+
     </section>
-    {% comment %} <script>
-        const checkboxes = document.querySelectorAll('input[type="checkbox"]');
-        checkboxes.forEach(checkbox => {
-            checkbox.addEventListener('click', () => {
-                checkbox.closest('form').submit();
-            });
-        });
-    </script> {% endcomment %}
 {% endblock %}
