@@ -1,59 +1,68 @@
 {% load movie_tag %}
-<header class="header">
-    <div class="container-fluid px-lg-5">
-        <!-- nav -->
-        <nav class="py-4">
-            <div id="logo">
-                <h1> <a href="{% url 'movies:index' %}" class="editContent" style="outline: none; outline-offset: -2px; cursor: inherit; color: rgb(255, 255, 255); font-size: 40px; background-color: rgba(0, 0, 0, 0); font-family: &quot;Source Sans Pro&quot;, sans-serif;">DjangoMovie</a></h1>
-            </div>
+<header>
+    <nav class="navbar navbar-expand-lg bg-body-tertiary">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="{% url 'movies:index' %}">BestMovie</a>
 
-            <label for="drop" class="toggle">Menu</label>
-            <input type="checkbox" id="drop">
-            <ul class="menu mt-2">
-                <li class="active"><a href="{% url 'movies:index' %}">Главная</a></li>
-                <li><a href="{% url 'movies:persons' %}">Персоны</a></li>
-                <li>
-                    <!-- First Tier Drop Down -->
-                    <label for="drop-2" class="toggle">Категории <span class="fa fa-angle-down" aria-hidden="true" ></span> </label>
-                    <a href="#">Категории <span class="fa fa-angle-down" aria-hidden="true"></span></a>
-                    <input type="checkbox" id="drop-2">
-                    <ul>
-                    {% get_categories as categories %}
-                    {% for category in categories %}
-                        <li><a href="{% url 'movies:movie_categories' category.slug %}">{{category.name}}</a></li>
-                    {% endfor %}
-                    </ul>
-                </li>
-                <li>
-                    <label for="drop-3" class="toggle">Закладки <span class="fa fa-angle-down" aria-hidden="true" ></span> </label>
-                    <a href="#"><span class="fa fa-angle-down" aria-hidden="true">Закладки</span></a>
-                    <input type="checkbox" id="drop-3">
-                    <ul>
-                        <li>
-                            <a href="{% url 'movies:bookmark_persons' %}">Персоны</a>
-                        </li>
-                        <li>
-                            <a href="{% url 'movies:bookmark_movies' %}">Фильмы</a>
-                        </li>
-                    </ul>
-                </li>
-                <li>
-                    {% if user.is_authenticated %}
-                        <label for="drop-4" class="toggle">{{user.username}} <span class="fa fa-angle-down" aria-hidden="true" ></span> </label>
-                        <a href="#">{{user.username}} <span class="fa fa-angle-down" aria-hidden="true"></span></a>
-                        <input type="checkbox" id="drop-4">
-                        <ul>
-                            <li>
-                                <a href="{% url 'users:logout' %}">Выход</a>
-                            </li>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Переключатель навигации">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item">
+                        <a class="nav-link active" aria-current="page" href="{% url 'movies:index' %}">Главная</a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'movies:persons' %}">Персоны</a>
+                    </li>
+
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            Категории
+                        </a>
+                        <ul class="dropdown-menu">
+                            {% get_categories as categories %}
+                            {% for category in categories %}
+                                <li><a class="dropdown-item" href="{% url 'movies:movie_categories' category.slug %}">{{category.name}}</a></li>
+                            {% endfor %}
                         </ul>
-                    {% else %}
-                        <a href="{% url 'users:login' %}" style="color: rgb(255, 255, 255); font-weight: 700; text-transform: uppercase;">Вход</a>
-                        <a href="{% url 'users:signup' %}" style="color: rgb(255, 255, 255); font-weight: 700; text-transform: uppercase;">Зарегистрироваться</a>
-                    {% endif %}
-                </li>
-            </ul>
-        </nav>
-        <!-- //nav -->
-    </div>
+                    </li>
+
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            Закладки
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="{% url 'movies:bookmark_persons' %}">Персоны</a></li>
+                            <li><a class="dropdown-item" href="{% url 'movies:bookmark_movies' %}">Фильмы</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="#">Что-то еще здесь</a></li>
+                        </ul>
+                    </li>
+
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            {{user.username}}
+                        </a>
+                        <ul class="dropdown-menu">
+                            {% if user.is_authenticated %}
+                                <li><a class="dropdown-item" href="{% url 'users:logout' %}">Выход</a></li>
+                            {% else %}
+                                <li><a class="dropdown-item" href="{% url 'users:login' %}">Вход</a></li>
+                                <li><a class="dropdown-item" href="{% url 'users:signup' %}">Зарегистрироваться</a></li>
+                            {% endif %}
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="#">Что-то еще здесь</a></li>
+                        </ul>
+                    </li>
+                </ul>
+                <form class="d-flex" role="search">
+                    <input class="form-control me-2" type="search" placeholder="Поиск" aria-label="Поиск">
+                    <button class="btn btn-outline-success" type="submit">Поиск</button>
+                </form>
+            </div>
+        </div>
+    </nav>
 </header>
