@@ -4,74 +4,76 @@
 {% load movie_tag %}
 {% block title %}Главная страница{% endblock title %}
 {% block content %}
-<div class="left-ads-display py-md-5 py-4">
-    <div class="row py-md-5 py-4">
-        <div class="desc1-left col-md-4">
-            {% thumbnail object.picture "600x800" crop="center" as picture %}
-                <img src="{{picture.url}}" class="img-fluid" alt="">
-            {% endthumbnail %}
-        </div>
-        <div class="desc1-right col-md-8 pl-lg-4">
-            <h3 class="editContent" style="outline: none; cursor: inherit;">
-                {{object.first_name}} {{object.last_name}}
-            </h3>
-            <ul>
-                <li style="list-style: none"><span><b>Дата рождения:</b> {{object.birthdate}} </span></li>
-                <li style="list-style: none"><span><b>Возраст:</b> {{object.get_age}} </span></li>
-                <li style="list-style: none"><span><b>Страна:</b> {{object.country}}</span></li>
-                <li style="list-style: none"><span><b>Пол:</b> {{object.get_gender_display}} </span></li>
-                <li style="list-style: none">
-                    <p>
-                        Рейтинг: {{object.get_like_rating}}
-                    </p>
-                    {% if user.is_authenticated %}
-                        {% get_status_vote object request.user as vote %}
-                        <a class="btn btn-primary" href="{% url 'movies:vote_person' object.id '1' %}">
-                            {% if vote == 1 %}
-                                <img style="width: 30px; height: 30px;" src="{% static 'img/like2_1.svg' %}" alt="За стеклом">
-                            {% else %}
-                                <img style="width: 30px; height: 30px;" src="{% static 'img/like2_2.svg' %}" alt="За стеклом">
-                            {% endif%}
-                            {{object.get_like_count}}
-                        </a>
-                        <a class="btn btn-primary" href="{% url 'movies:vote_person' object.id '-1' %}">
-                            {% if vote == -1 %}
-                                <img style="width: 30px; height: 30px;" src="{% static 'img/dislike1_1.svg' %}" alt="За стеклом">
-                            {% else %}
-                                <img style="width: 30px; height: 30px;" src="{% static 'img/dislike1_2.svg' %}" alt="За стеклом">
-                            {% endif%}
-                            {{object.get_dislike_count}}
-                        </a>
-                    {% endif %}
-                </li>
-                <li style="list-style: none">
-                    <div class="sub-para-w3layouts mt-2">
-                        {% if user.is_authenticated %}
-                        {% bookmark_is_exists object user as bookmark %}
-                            <a class="btn btn-primary" href="{% url 'movies:add_bookmark_person' object.id %}">
-                                {% if bookmark %}
-                                    <img style="width: 30px; height: 30px;" src="{% static 'img/bookmark_is.svg' %}" alt="За стеклом">
-                                {% else %}
-                                    <img style="width: 30px; height: 30px;" src="{% static 'img/bookmark_not.svg' %}" alt="За стеклом">
-                                {% endif%}
-                            </a>
-                        {% endif %}
-                    </div>
-                </li>
-                <li style="list-style: none">
-                    <div class="row sub-para-w3layouts mt-5">
-                        <h3 class="shop-sing editContent" style="outline: none; cursor: inherit;">
-                            Об актере {{object.first_name}} {{object.last_name}}
-                        </h3>
-                        <p class="mt-3 editContent" style="outline: none; cursor: inherit;">
-                            {{ object.description|linebreaks }}
+<div class="container">
+    <div class="card">
+        <div class="card mb-3 card_movie_detail">
+            <div class="row g-0">
+
+                <div class="col-md-4">
+                    {% thumbnail object.picture "600x900" crop="center" as picture %}
+                        <img src="{{picture.url}}" class="img-fluid rounded-start" alt="Photo of actor">
+                    {% endthumbnail %}
+                </div>  <!-- фото фильма -->
+
+                <div class="col-md-8">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between">
+                            <h1 class="card-title">{{object.first_name}} {{object.last_name}}</h1>
+                            {% if user.is_authenticated %}
+                                {% bookmark_is_exists object user as bookmark %}
+                                <a class="btn btn-primary" href="{% url 'movies:add_bookmark_person' object.id %}">
+                                    {% if bookmark %}
+                                        <img style="width: 30px; height: 30px;" src="{% static 'img/bookmark_is.svg' %}" alt="За стеклом">
+                                    {% else %}
+                                        <img style="width: 30px; height: 30px;" src="{% static 'img/bookmark_not.svg' %}" alt="За стеклом">
+                                    {% endif%}
+                                </a>
+                                {% endif %}
+                        </div>
+
+                        <p class="card-text">
+                            <ul class="p-0 p-lg-2">
+                                <li class="mb-2"><span><b>Дата рождения:</b> {{object.birthdate}} </span></li>
+                                <li class="mb-2"><span><b>Возраст:</b> {{object.get_age}}</span>
+                                <li class="mb-2"><span><b>Страна:</b> {{object.country}}</span>
+                                <li class="mb-2"><span><b>Пол:</b> {{object.get_gender_display}}</span>
+                                <li class="mb-2">Рейтинг: {{object.get_like_rating}}</span>
+                                <li class="mb-2">
+                                    {% if user.is_authenticated %}
+                                        {% get_status_vote object request.user as vote %}
+                                        <a class="btn btn-primary" href="{% url 'movies:vote_person' object.id '1' %}">
+                                            {% if vote == 1 %}
+                                                <img style="width: 30px; height: 30px;" src="{% static 'img/like2_1.svg' %}" alt="За стеклом">
+                                            {% else %}
+                                                <img style="width: 30px; height: 30px;" src="{% static 'img/like2_2.svg' %}" alt="За стеклом">
+                                            {% endif%}
+                                            {{object.get_like_count}}
+                                        </a>
+                                        <a class="btn btn-primary" href="{% url 'movies:vote_person' object.id '-1' %}">
+                                            {% if vote == -1 %}
+                                                <img style="width: 30px; height: 30px;" src="{% static 'img/dislike1_1.svg' %}" alt="За стеклом">
+                                            {% else %}
+                                                <img style="width: 30px; height: 30px;" src="{% static 'img/dislike1_2.svg' %}" alt="За стеклом">
+                                            {% endif%}
+                                            {{object.get_dislike_count}}
+                                        </a>
+                                    {% endif %}
+                                </li>
+                            </ul>
                         </p>
                     </div>
-                </li>
-        </div>
-    </div>
-    <div class="desc1-right row">
-        <h3>Фильмография:</h3>
+                </div>  <!-- данные о фильме -->
+
+            </div>
+        </div>  <!-- верхний блок-->
+
+        <div class="card-body">
+            <h5 class="card-title">Об актере {{object.first_name}} {{object.last_name}}</h5>
+            <p class="card-text">{{ object.description|linebreaks }}</p>
+        </div> <!-- текстовое описание фильма -->
+
+        <div class="row mx-2">
+            <h3>Фильмография:</h3>
             {% for movie in object.actor_movies.all %}
             <div style="text-align: center; width: 200px;">
                 <a href="{{movie.get_absolute_url}}">
@@ -93,7 +95,11 @@
                 <span style="font-size: small;">{{movie.name}}</span>
             </div>
             {% endfor %}
-    </div>
-    </div>
-</div>
+        </div>
+    
+    </div>  <!-- карточка фильма -->
+
+    <div class="container-fluid p-0">{% include 'includes/comments.html' %}</div>  <!-- комментарии -->
+</div>  <!--container-->
+
 {% endblock %}

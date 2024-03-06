@@ -13,12 +13,6 @@ from django.contrib.contenttypes.fields import (
 User = get_user_model()
 
 
-def get_upload_path(instance, filename):
-    """Функция для определения пути изображений."""
-    today = timezone.now().strftime("%Y/%m/%d")
-    return f"{instance.__class__.__name__}/{today}/{filename}"
-
-
 class Person(models.Model):
     """Актеры и режиссеры."""
     M = "М"
@@ -217,6 +211,8 @@ class Movie(models.Model):
 
     @property
     def get_average_rating(self):
+        """Метод для вычисление среднего рейтинга по сайту."""
+
         return self.ratings.aggregate(avg=models.Avg("score")).get("avg")
 
 

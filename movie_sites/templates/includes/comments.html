@@ -1,99 +1,86 @@
 {% load static %}
 {% load movie_tag %}
-<div class="row mx-5 px-5">
+<div class="mt-2">
     <div>
-        <!-- contact form grid -->
-        <div style="width: 60%;">
-            <h3>
-                <span class="sub-tittle editContent" style="outline: none; cursor: inherit;">{{object.reviews.count}}</span>Оставить отзыв</h3>
-            <form action="{% url 'movies:add_comment' object.id %}" method="post" class="mt-4" id="formComment">
-                {% csrf_token %}
-                <input type="hidden" name="major" id="contactparent" value="">
-                <div style="display: flex; align-self: stretch">
-                    <p>
-                        {{form.name.label}}{{form.name}}
-                    </p>
-                    <p>
-                        {{form.email.label}}{{form.email}}
-                    </p>
-                </div>
-                <p>
-                    {{form.text.label}}{{form.text}}
-                </p>
-                <button type="submit" class="mt-3 btn btn-success btn-block py-3">
-                    Отправить
-                </button>
-            </form>
-        </div>
-        <!--  //contact form grid ends here -->
-    </div>
-    {% for comment in object.get_comments %}
-    <div class="py-1" style="border: 1px solid black;">
-        {% comment %} <img src="bundles/images/te2.jpg" class="mr-3 img-fluid" alt="image" style="outline: none; cursor: inherit;"> {% endcomment %}
-        <div class="mx-5">
-            <h5>
-                {{comment.name}}
-            </h5>
-            <p class="mt-2">
-                {{comment.text}}
+        <h3><span class="">{{object.reviews.count}}</span>Оставить отзыв</h3>
+        <form action="{% url 'movies:add_comment' object.id %}" method="post" class="mt-4" id="formComment">
+            {% csrf_token %}
+            <input type="hidden" name="major" id="contactparent" value="">
+            <div class="input-group mb-3">
+                {{form.name}}
+                {{form.email}}
+            </div>
+            <p>
+                {{form.text}}
             </p>
-            <a href="#formComment" onclick="addComment('{{comment.name}}', '{{comment.id}}')">Ответить</a>
-            {% if user.is_authenticated %}
-                {% get_status_vote comment request.user as vote %}
-                {% if vote %}
-                    есть контент
-                {% endif %}
-                <a class="btn btn-primary" href="{% url 'movies:vote_comment' comment.id '1' %}">
-                    {% if vote == 1 %}
-                        <img style="width: 30px; height: 30px;" src="{% static 'img/like2_1.svg' %}" alt="За стеклом">
-                    {% else %}
-                        <img style="width: 30px; height: 30px;" src="{% static 'img/like2_2.svg' %}" alt="За стеклом">
-                    {% endif %}
-                    {{comment.get_like_count}}
-                </a>
-                <a class="btn btn-primary" href="{% url 'movies:vote_comment' comment.id '-1' %}">
-                    {% if vote == -1 %}
-                        <img style="width: 30px; height: 30px;" src="{% static 'img/dislike1_1.svg' %}" alt="За стеклом">
-                    {% else %}
-                        <img style="width: 30px; height: 30px;" src="{% static 'img/dislike1_2.svg' %}" alt="За стеклом">
-                    {% endif %}
-                    {{comment.get_dislike_count}}
-                </a>
-            {% endif %}
-            {% for com in comment.children.all %}
-            <div class="mt-1 px-5" style="border: 1px solid black;">
-                {% comment %} <a class="pr-3" href="#"> {% endcomment %}
-                    {% comment %} <img src="#" class="img-fluid" alt="image"> {% endcomment %}
-                    {% comment %} </a> {% endcomment %}
-                    <div>
-                        <h5 class="mt-0">{{com.name}}</h5>
-                        <p class="mt-2"> {{com.text}}</p>
+            <button type="submit" class="btn btn-primary">
+                Отправить
+            </button>
+        </form> 
+    </div>  <!--форма комментариев-->
+
+    <div class="mt-3">
+        {% for comment in object.get_comments %}
+            <div class="card mb-3">
+                <div class="card-body">
+                    <h5 class="card-title ps-3">{{comment.name}}</h5>
+                    <p class="card-text ps-3">{{comment.text}}</p>
+                    <div class="ps-3">
+                        <a href="#formComment" onclick="addComment('{{comment.name}}', '{{comment.id}}')" class="btn btn-primary">Ответить</a>
+                        {% if user.is_authenticated %}
+                            {% get_status_vote comment request.user as vote %}
+                            <a class="btn btn-primary" href="{% url 'movies:vote_comment' comment.id '1' %}">
+                                {% if vote == 1 %}
+                                    <img style="width: 20px; height: 20px;" src="{% static 'img/like2_1.svg' %}" alt="За стеклом">
+                                {% else %}
+                                    <img style="width: 20px; height: 20px;" src="{% static 'img/like2_2.svg' %}" alt="За стеклом">
+                                {% endif %}
+                                {{comment.get_like_count}}
+                            </a>
+                            <a class="btn btn-primary" href="{% url 'movies:vote_comment' comment.id '-1' %}">
+                                {% if vote == -1 %}
+                                    <img style="width: 20px; height: 20px;" src="{% static 'img/dislike1_1.svg' %}" alt="За стеклом">
+                                {% else %}
+                                    <img style="width: 20px; height: 20px;" src="{% static 'img/dislike1_2.svg' %}" alt="За стеклом">
+                                {% endif %}
+                                {{comment.get_dislike_count}}
+                            </a>
+                        {% endif %}
+                    </div>
+                </div>
+
+                {% for com in comment.children.all %}
+                    <div class="card text-bg-secondary me-1 me-lg-5 mb-1 mb-lg-3 w-75 ms-auto">
+                    <div class="card-body">
+                        <h5 class="card-title">{{com.name}}</h5>
+                        <p class="card-text">{{com.text}}</p>
                         {% if user.is_authenticated %}
                             {% get_status_vote com request.user as vote %}
                             <a class="btn btn-primary" href="{% url 'movies:vote_comment' com.id '1' %}">
                                 {% if vote == 1 %}
-                                    <img style="width: 30px; height: 30px;" src="{% static 'img/like2_1.svg' %}" alt="За стеклом">
+                                    <img style="width: 20px; height: 20px;" src="{% static 'img/like2_1.svg' %}" alt="За стеклом">
                                 {% else %}
-                                    <img style="width: 30px; height: 30px;" src="{% static 'img/like2_2.svg' %}" alt="За стеклом">
+                                    <img style="width: 20px; height: 20px;" src="{% static 'img/like2_2.svg' %}" alt="За стеклом">
                                 {% endif %}
                                 {{com.get_like_count}}
                             </a>
                             <a class="btn btn-primary" href="{% url 'movies:vote_comment' com.id '-1' %}">
                                 {% if vote == -1 %}
-                                    <img style="width: 30px; height: 30px;" src="{% static 'img/dislike1_1.svg' %}" alt="За стеклом">
+                                    <img style="width: 20px; height: 20px;" src="{% static 'img/dislike1_1.svg' %}" alt="За стеклом">
                                 {% else %}
-                                    <img style="width: 30px; height: 30px;" src="{% static 'img/dislike1_2.svg' %}" alt="За стеклом">
+                                    <img style="width: 20px; height: 20px;" src="{% static 'img/dislike1_2.svg' %}" alt="За стеклом">
                                 {% endif %}
                                 {{com.get_dislike_count}}
                             </a>
                         {% endif %}
-                </div>
-            </div>
-            {% endfor %}
-        </div>
-    </div>
-    {% endfor %}
-</div>
+                    </div>  <!-- card-body -->
+                    </div> <!-- вывод дочерних комментариев -->
+                {% endfor %}  <!--цикл для дочерних комментариев-->
+            </div>  <!--card comments-->
+        {% endfor %}  <!--цикл для родительских комментариев-->
+    </div> <!--комментарии/вывод всех родительских комментариев к фильму-->
+
+</div>  <!--вывод комментариев-->
 <script>
     function addComment(name, id) {
         document.getElementById("contactparent").value = id

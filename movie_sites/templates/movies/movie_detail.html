@@ -2,128 +2,105 @@
 {% load thumbnail %}
 {% load movie_tag %}
 {% load static %}
-{% block title %}Главная страница{% endblock title %}
+{% block title %}{{object.name}}({{object.release_year}}){% endblock title %}
 {% block content %}
-<div class="py-md-5 py-4 margin-top:10px" style="margin-top:10px">
-    <div class="row">
-        <div class="desc1-left col-md-4">
-            {% thumbnail object.poster "600x800" crop="center" as poster %}
-                <img src="{{poster.url}}" class="img-fluid" alt="Постер">
-            {% endthumbnail %}
-        </div>
-        <div class="desc1-right col-md-8 pl-lg-4">
-            <h3>{{object.name}}</h3>
-            <ul>
-                <li style="list-style: none"><span><b>Год:</b> {{object.release_year}} </span></li>
-                <li style="list-style: none"><span><b>Страна:</b> {{ object.countries.all|join:', ' }}</span>
-                </li>
-                <li class="row py-4" style="list-style: none"><b>Режиссер:</b> 
-                    {% for director in object.directors.all %}
-                    <div style="text-align: center; width: 100px; height: 100px; margin-right: 10px;">
-                        <a href="{{director.get_absolute_url}}">
-                            {% thumbnail director.picture "100x100" crop="center" as picture %}
-                            <img src="{{picture.url}}"/>
-                            {% endthumbnail %}
-                            <span style="font-size: small;">{{director}}</span>
-                        </a>
-                    </div>
-                    {% endfor %}
-                </li>
-                <li class="row py-4" style="list-style: none"><b>Актеры:</b> 
-                    {% for actor in object.actors.all %}
-                    <div style="text-align: center; width: 100px; height: 100px; margin-right: 10px;">
-                        <a href="{{actor.get_absolute_url}}">
-                            {% thumbnail actor.picture "100x100" crop="center" as picture %}
-                            <img src="{{picture.url}}"/>
-                            {% endthumbnail %}
-                            <span style="font-size: small;">{{actor}}</span>
-                        </a>
-                    </div>
-                    {% endfor %}
-                </li>
-                <li class="py-4" style="list-style: none">
-                    <span><b>Жанр:</b>
-                        {{ object.genres.all|join:', ' }}
-                    </span>
-                </li>
-                <li style="list-style: none; padding-left: 10px;">
-                    <div>
-                        <p><h3>Рейтинг: {{object.rating}}</h3></p>
-                        <form action="{% url 'movies:add_rating' %}" method="post" name="rating">
-                            {% csrf_token %}
-                            <input type="hidden" value="{{object.id}}" name="movie">
-                            {{rating_form}}
-                        </form>
-                    </div>
-                </li>
-                <li style="list-style: none">
-                    <div class="mt-2">
-                        {% if user.is_authenticated %}
-                        {% bookmark_is_exists object user as bookmark %}
-                            <a class="btn btn-primary" href="{% url 'movies:add_bookmark_movie' object.id %}">
-                                {% if bookmark %}
-                                    <img style="width: 30px; height: 30px;" src="{% static 'img/bookmark_is.svg' %}" alt="За стеклом">
-                                {% else %}
-                                    <img style="width: 30px; height: 30px;" src="{% static 'img/bookmark_not.svg' %}" alt="За стеклом">
-                                {% endif%}
-                            </a>
-                        {% endif %}
-                    </div>
-                </li>
-                <li style="list-style: none">
-                    <h3 class="shop-sing">
-                        О фильме {{object.name }}</h3>
-                    <p>
-                        {{object.description|linebreaks }}
-                    </p>
-                </li>
-            </ul>
-                <div class="share-desc">
-                    <div class="share">
-                        <h4>
-                            Share:</h4>
-                        <ul class="w3layouts_social_list list-unstyled">
-                            <li>
-                                <a href="#" class="w3pvt_facebook editContent"
-                                   style="outline: none; cursor: inherit;">
-                                <span class="fa fa-facebook-f"
-                                      style="outline: none; cursor: inherit;"></span>
-                                </a>
-                            </li>
-                            <li>
-                                <a href="#" class="w3pvt_twitter editContent"
-                                   style="outline: none; cursor: inherit;">
-                                <span class="fa fa-twitter"
-                                      style="outline: none; cursor: inherit;"></span>
-                                </a>
-                            </li>
-                            <li>
-                                <a href="#" class="w3pvt_dribble editContent"
-                                   style="outline: none; cursor: inherit;">
-                                <span class="fa fa-dribbble"
-                                      style="outline: none; cursor: inherit;"></span>
-                                </a>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-        </div>
-    </div>
-    {% comment %} <div class="row sub-para-w3layouts mt-5">
-        <p class="mt-3 italic-blue editContent"
-           style="outline: none; cursor: inherit;">
-            <iframe width="560" height="315"
-                    src="https://www.youtube.com/embed/A36LahZNUiE?controls=0"
-                    frameborder="0" allow="accelerometer; autoplay;
-                                                           encrypted-media; gyroscope; picture-in-picture"
-                    allowfullscreen>
+<div class="container">
+    <div class="card">
+        <div class="card mb-3 card_movie_detail">
+            <div class="row g-0">
 
-            </iframe>
-        </p>
-    </div> {% endcomment %}
-    <hr>
-    {% include 'includes/comments.html' %}
-</div>
+                <div class="col-md-4">
+                    {% thumbnail object.poster "600x900" crop="center" as poster %}
+                        <img src="{{poster.url}}" class="img-fluid rounded-start" alt="Постер">
+                    {% endthumbnail %}
+                </div>  <!-- постер фильма -->
+
+                <div class="col-md-8">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between">
+                            <h1 class="card-title">{{object.name}}</h1>
+                            {% if user.is_authenticated %}
+                                {% bookmark_is_exists object user as bookmark %}
+                                <a class="btn btn-primary" href="{% url 'movies:add_bookmark_movie' object.id %}">
+                                    {% if bookmark %}
+                                        <img style="width: 30px; height: 30px;" src="{% static 'img/bookmark_is.svg' %}" alt="За стеклом">
+                                    {% else %}
+                                        <img style="width: 30px; height: 30px;" src="{% static 'img/bookmark_not.svg' %}" alt="За стеклом">
+                                    {% endif%}
+                                </a>
+                            {% endif %}
+                        </div>
+
+                        <p class="card-text">
+                            <ul class="p-0 p-lg-2">
+                                <li class="mb-2"><span><b>Год:</b> {{object.release_year}} </span></li>
+                                <li class="mb-2"><span><b>Страна:</b> {{ object.countries.all|join:', ' }}</span>
+                                </li>
+                                <li class="mb-2"><b>Режиссер:</b>
+                                    <div class="d-flex">
+                                        {% for director in object.directors.all %}
+                                        <div class="card text-center me-2" style="width: 7rem;">
+                                            {% thumbnail director.picture "100x80" crop="center" as picture %}
+                                                <a href="{{director.get_absolute_url}}"><img src="{{picture.url}}" class="card-img-top" alt="..."></a>
+                                            {% endthumbnail %}
+                                            <div class="card-body p-0" style="text">
+                                                {{director}}
+                                            </div>
+                                        </div>
+                                        {% endfor %}
+                                    </div>
+                                </li>
+
+                                <li class="mb-2"><b>Актеры:</b>
+                                    <div class="d-flex">
+                                        {% for actor in object.actors.all %}
+                                        <div class="card text-center me-2" style="width: 7rem;">
+                                            {% thumbnail actor.picture "100x80" crop="center" as picture %}
+                                                <a href="{{actor.get_absolute_url}}"><img src="{{picture.url}}" class="card-img-top" alt="..."></a>
+                                            {% endthumbnail %}
+                                            <div class="card-body p-0" style="text">
+                                                {{actor}}
+                                            </div>
+                                        </div>
+                                        {% endfor %}
+                                    </div>
+                                </li>
+
+                                <li class="mb-2">
+                                    <span><b>Жанр:</b>
+                                        {{ object.genres.all|join:', ' }}
+                                    </span>
+                                </li>
+
+                                <li class="mb-2">
+                                    <div>
+                                        <p><h3>Рейтинг: {{object.rating}}</h3></p>
+                                        <form action="{% url 'movies:add_rating' %}" method="post" name="rating">
+                                            {% csrf_token %}
+                                            <input type="hidden" value="{{object.id}}" name="movie">
+                                            {{rating_form}}
+                                        </form>
+                                    </div>
+                                </li>
+
+                            </ul>
+                        </p>
+                    </div>
+                </div>  <!-- данные о фильме -->
+
+            </div>
+        </div>  <!-- верхний блок-->
+
+        <div class="card-body">
+            <h5 class="card-title">О фильме {{object.name }}</h5>
+            <p class="card-text">{{object.description|linebreaks }}</p>
+        </div> <!-- текстовое описание фильма -->
+    
+    </div>  <!-- карточка фильма -->
+    <div class="container-fluid p-0">{% include 'includes/comments.html' %}</div>  <!-- комментарии -->
+</div>  <!--container-->
+
+<!--рейтинг-->
 <script>
     const rating = document.querySelector('form[name=rating]');
     
@@ -139,35 +116,3 @@
     });
 </script>
 {% endblock %}
-{% comment %} {% block content %} {% endcomment %}
-{% comment %} <div class="main-banner bg bg1" id="home" style="background-color: rgba(0, 0, 0, 0); margin-top: 0px; background-image: url(&quot;bundles/single-post-pic.jpg&quot;);"> {% endcomment %}
-    {% comment %} <!-- header --> {% endcomment %}
-    {% comment %} {%include 'includes/header.html' %} {% endcomment %}
-    {% comment %} <!-- //header --> {% endcomment %}
-    {% comment %} <!--/banner--> {% endcomment %}
-    {% comment %} <div class="banner-info"> {% endcomment %}
-        {% comment %} <p class="editContent" >лучший сайт на django 3</p> {% endcomment %}
-        {% comment %} <h3 class="mb-4 editContent">Все о кино</h3> {% endcomment %}
-        {% comment %} <div class="ban-buttons"> {% endcomment %}
-{% comment %}  {% endcomment %}
-{% comment %}  {% endcomment %}
-        {% comment %} </div> {% endcomment %}
-    {% comment %} </div> {% endcomment %}
-    {% comment %} <!--// banner-inner --> {% endcomment %}
-{% comment %}  {% endcomment %}
-{% comment %} </div> {% endcomment %}
-{% comment %} <!--//main-content--> {% endcomment %}
-{% comment %} <!----> {% endcomment %}
-{% comment %} <ol class="breadcrumb editContent"> {% endcomment %}
-    {% comment %} <li class="breadcrumb-item"> {% endcomment %}
-        {% comment %} <a href="index.html" class="editContent">Home</a> {% endcomment %}
-    {% comment %} </li> {% endcomment %}
-    {% comment %} <li class="breadcrumb-item active editContent">Single Page</li> {% endcomment %}
-{% comment %} </ol> {% endcomment %}
-{% comment %} <div> {% endcomment %}
-    {% comment %} {% thumbnail object.poster "400x500" crop="center" as poster %} {% endcomment %}
-        {% comment %} <img src="{{poster.url}}" width="poster.width" height="poster.height"> {% endcomment %}
-    {% comment %} {% endthumbnail %} {% endcomment %}
-    {% comment %} <p>{{object.name}}({{object.release_year}})</p> {% endcomment %}
-{% comment %} </div> {% endcomment %}
-{% comment %} {% endblock %} {% endcomment %}

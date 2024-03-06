@@ -22,7 +22,7 @@
                     <p class="card-text">Рейтинг: {{movie.rating}}</p>
 
                     {% if user.is_authenticated %}
-                        {% bookmark_is_exists movie user as bookmark %}
+                        {% bookmark_is_exists movie user as bookmark %} <!--Определяет находится ли фильм в избранных-->
                         <a class="btn btn-primary" href="{% url 'movies:add_bookmark_movie' movie.id %}">
                             {% if bookmark %}
                                 <img style="width: 20px; height: 20px;" src="{% static 'img/bookmark_is.svg' %}" alt="За стеклом">
@@ -34,9 +34,9 @@
 
                 </div>
 
-            </div>
+            </div> <!--card-body-->
 
-        </div>
+        </div> <!-- card -->
 
     </div>
 

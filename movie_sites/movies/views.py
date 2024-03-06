@@ -1,10 +1,13 @@
-from typing import Any
 from django.contrib import messages
 from django.db.models import Avg
-from django.db.models.query import QuerySet
 from django.contrib.contenttypes.models import ContentType
 from django.http import HttpResponse
 from django.shortcuts import redirect
+from django.views.generic import ListView, CreateView, DetailView
+from django.views.generic.base import View
+from django.urls import reverse_lazy
+
+
 from .models import (
     Person,
     Movie,
@@ -17,7 +20,7 @@ from .forms import (
     MovieForm,
     CommentForm,
     RatingForm,
-    MovieFormSet
+    MovieFormSet,
 )
 from .utils import get_ip
 from .filters import (
@@ -25,9 +28,51 @@ from .filters import (
     FilterOrderMovieMixin,
     FilterOrderMultipleMixin
 )
-from django.views.generic import ListView, CreateView, DetailView
-from django.urls import reverse_lazy
-from django.views.generic.base import View
+
+
+class MovieListView(FilterOrderMovieMixin, ListView):
+    """Класс-представление для вывода списка всех фильмов с пагинацией."""
+
+    model = Movie
+    template_name = "movies/movies.html"
+    paginate_by = 8
+    extra_context = {"title": "Фильмы"}
+
+
+class MovieDetailView(DetailView):
+    """Класс-представление для вывода определенного фильма по 'id'."""
+
+    model = Movie
+    template_name = "movies/movie_detail.html"
+    pk_url_kwarg = "movie_id"
+
+    def get_context_data(self, **kwargs):
+        """
+        Добавление формы 'RatingForm' с полем 'score' для оценки пользователем
+        текущего фильма. Поле 'ip' определяется из request.
+        Если пользователь уже оценил фильм, то выводит его предыдущую оценку.
+        """
+
+        context = super().get_context_data(**kwargs)
+        instance = self.object.ratings.filter(ip=get_ip(self.request))
+        if instance:
+            context["rating_form"] = RatingForm(instance=instance[0])
+        else:
+            context["rating_form"] = RatingForm()
+        context["form"] = CommentForm()
+        return context
+
+
+class MovieSearchView(ListView):
+    """Класс-представления для поиска фильма по названию."""
+
+    model = Movie
+    template_name = "movies/movies.html"
+    paginate_by = 8
+
+    def get_queryset(self):
+        search = self.request.GET.get("s")
+        return Movie.objects.filter(name__icontains=search)
 
 
 class MovieCreateView(CreateView):
@@ -73,7 +118,7 @@ class PersonListView(FilterOrderPersonMixin, ListView):
     """Возвращает список персон."""
     model = Person
     template_name = "movies/person_list.html"
-    paginate_by = 6
+    paginate_by = 8
     extra_context = {"title": "Персоны"}
 
 
@@ -91,32 +136,6 @@ class PersonDetailView(DetailView):
     template_name = "movies/person_detail.html"
     extra_context = {"title": "Детальная информация"}
     pk_url_kwarg = "person_id"
-
-
-class MovieListView(FilterOrderMovieMixin, ListView):
-    """Возвращает список фильмов."""
-    model = Movie
-    template_name = "movies/movies.html"
-    paginate_by = 6
-    extra_context = {"title": "Фильмы"}
-
-
-class MovieDetailView(DetailView):
-    """Возвращает определенный по id фильм."""
-    model = Movie
-    template_name = "movies/movie_detail.html"
-    extra_context = {"title": "Фильм"}
-    pk_url_kwarg = "movie_id"
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        instance = self.object.ratings.filter(ip=get_ip(self.request))
-        if instance:
-            context["rating_form"] = RatingForm(instance=instance[0])
-        else:
-            context["rating_form"] = RatingForm()
-        context["form"] = CommentForm()
-        return context
 
 
 class AddComment(View):
@@ -160,7 +179,7 @@ class MovieCategoriesView(FilterOrderMovieMixin, ListView):
     template_name = "movies/movies.html"
     paginate_by = 6
 
-    def get_queryset(self) -> QuerySet[Any]:
+    def get_queryset(self):
         category_slug = self.kwargs["category_slug"]
         return super().get_queryset().filter(category__slug=category_slug)
 
@@ -216,5 +235,5 @@ class BookmarkListView(FilterOrderMultipleMixin, ListView):
     template_name = None
     paginate_by = 6
 
-    def get_queryset(self) -> QuerySet[Any]:
+    def get_queryset(self):
         return super().get_queryset().filter(bookmarks__user=self.request.user)

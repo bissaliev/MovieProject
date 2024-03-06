@@ -58,8 +58,11 @@
                         </ul>
                     </li>
                 </ul>
-                <form class="d-flex" role="search">
-                    <input class="form-control me-2" type="search" placeholder="Поиск" aria-label="Поиск">
+                <form action="{% url 'movies:movie_search' %}" class="d-flex" role="search">
+                    {% comment %} {{filter_form.search.label}} {% endcomment %}
+                    {% comment %} {{filter_form.search}} {% endcomment %}
+                    {% comment %} {{search_form.s}} {% endcomment %}
+                    <input class="form-control me-2" type="search" placeholder="Поиск" aria-label="Поиск" name="s">
                     <button class="btn btn-outline-success" type="submit">Поиск</button>
                 </form>
             </div>

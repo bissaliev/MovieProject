@@ -3,15 +3,6 @@
 {% load thumbnail %}
 <form method="get" name="filter">
     <div>
-        <p>
-            {{filter_form.search.label}}
-            {{filter_form.search}}
-            <button class="btn btn-primary" >
-                <img src="{% static 'img/search.svg' %}" alt="" style="width: 30px; height: 30px;">
-            </button>
-        </p>
-
-        <button type="submit" class="btn btn-sm btn-primary btn-raised m-3">Сортировать</button>
 
         <p>
             {{filter_form.sort.label}}
@@ -41,4 +32,4 @@
     
     <button type="submit" class="btn btn-sm btn-primary btn-raised mr-3">Фильтровать</button>
 </form>
-{% get_last_movies count=5 %}
+{% get_last_movies count=5 %}  <!--Вывод последних добавленных фильмов-->

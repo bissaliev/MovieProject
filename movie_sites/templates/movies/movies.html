@@ -5,23 +5,23 @@
 
         <div class="container-fluid py-md-3">
 
-                <button class="btn btn-primary mb-2" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasCart" aria-controls="offcanvasCart">
-                    Фильтрация
-                </button>
+            <button class="btn btn-primary mb-2" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasMovie" aria-controls="offcanvasMovie">
+                Фильтрация
+            </button>
 
-                <div class="offcanvas offcanvas-start" tabindex="-1" id="offcanvasCart" aria-labelledby="offcanvasCartLabel">
-                    <div class="offcanvas-header">
-                        <h5 class="offcanvas-title" id="offcanvasCartLabel">Фильтрация</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
-                    </div>
-                    <div class="offcanvas-body">
-                        {% include 'movies/includes/sidebar_movies.html' %}
-                    </div>
+            <div class="offcanvas offcanvas-start" tabindex="-1" id="offcanvasMovie" aria-labelledby="offcanvasMovieLabel">
+                <div class="offcanvas-header">
+                    <h5 class="offcanvas-title" id="offcanvasMovieLabel">Фильтрация</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
                 </div>
+                <div class="offcanvas-body">
+                    {% include 'movies/includes/sidebar_movies.html' %}
+                </div>
+            </div>
 
-                <div>{% include 'movies/includes/movie_objects.html' %}</div>
+            <div>{% include 'movies/includes/movie_objects.html' %}</div>
 
-                <div class="pt-5">{% include 'includes/paginator.html' %}</div>
+            <div class="pt-5">{% include 'includes/paginator.html' %}</div>
         </div>
 
     </section>

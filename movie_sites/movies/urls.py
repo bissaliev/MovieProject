@@ -11,7 +11,8 @@ from .views import (
     LikeDislikeView,
     MovieCategoriesView,
     AddBookmarkView,
-    BookmarkListView
+    BookmarkListView,
+    MovieSearchView
 )
 from .models import Comment, Person, Movie
 
@@ -71,4 +72,5 @@ urlpatterns = [
             model=Movie, template_name="movies/movies.html"),
         name="bookmark_movies"
     ),
+    path("search/", MovieSearchView.as_view(), name="movie_search")
 ]

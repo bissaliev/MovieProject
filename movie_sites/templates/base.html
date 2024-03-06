@@ -10,7 +10,7 @@
     {% comment %} <link rel="stylesheet" href="{% static 'css/style2.css' %}" type="text/css"> {% endcomment %}
    
     <link rel="stylesheet" href="{% static 'css/style.css' %}" type="text/css" media="all">
-    <title>{% block title %}{% endblock %}</title>
+    <title>{% block title %}{{title}}{% endblock %}</title>
 </head>
 <body>
     {%include 'includes/header.html' %}

@@ -3,19 +3,26 @@
 {% load movie_tag %}
 {% block title %}{{title}}{% endblock title %}
 {% block content %}
-        <section class="py-md-5 py-4" style="padding-left: 3rem; padding-right: 3rem;">
-            <div class="container-fluid py-md-3">
-                <div class="row">
+    <section class="mt-5 m-lg-5">
+        <div class="container-fluid py-md-3">
+            <button class="btn btn-primary mb-2" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasMovie" aria-controls="offcanvasMovie">
+                Фильтрация
+            </button>
+
+            <div class="offcanvas offcanvas-start" tabindex="-1" id="offcanvasMovie" aria-labelledby="offcanvasMovieLabel">
+                <div class="offcanvas-header">
+                    <h5 class="offcanvas-title" id="offcanvasMovieLabel">Фильтрация</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+                </div>
+                <div class="offcanvas-body">
                     {% include 'movies/includes/sidebar_persons.html' %}
-                    <div class="col-lg-9">
-                        Всего: {{paginator.count}}
-                        <div class="row">
-                            {% include 'movies/includes/person_objects.html' %}
-                            {% include 'includes/paginator.html' %}
-                        </div>
-                    </div>
                 </div>
             </div>
-        </section>
-</body>
+
+            <div>{% include 'movies/includes/person_objects.html' %}</div>
+
+            <div>{% include 'includes/paginator.html' %}</div>
+
+        </div>
+    </section>
 {% endblock %}

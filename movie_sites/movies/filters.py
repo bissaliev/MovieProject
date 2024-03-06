@@ -1,6 +1,5 @@
 from django.db.models import Q
 from django.db.models.query import QuerySet
-from typing import Any
 
 from .models import Person, MovieActor
 from .forms import FilterPersonForm, FilterMovieForm
@@ -13,12 +12,12 @@ class FilterOrderPersonMixin:
     сортировка по имени(А-Я, Я-А), по дате рождения(на убывание и возрастание).
     """
 
-    def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
+    def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["filter_form"] = FilterPersonForm(self.request.GET)
         return context
 
-    def get_queryset(self) -> QuerySet[Any]:
+    def get_queryset(self):
         queryset = super().get_queryset()
         actor_ids = MovieActor.objects.values_list("actor_id", flat=True)
         search = self.request.GET.get("search")
@@ -47,20 +46,17 @@ class FilterOrderMovieMixin:
     сортировка по названию(А-Я, Я-А), рейтингу(На убывание и возрастание),
     году производства(На возрастание и убывание).
     """
-    def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
+    def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["filter_form"] = FilterMovieForm(self.request.GET)
         return context
 
     def get_queryset(self):
         queryset = super().get_queryset()
-        search = self.request.GET.get("search")
         filter_genres = self.request.GET.getlist("filter_genres")
         filter_rating = self.request.GET.get("filter_rating")
         filter_countries = self.request.GET.getlist("filter_countries")
         filter_years = self.request.GET.getlist("filter_years")
-        if search:
-            queryset = queryset.filter(name__icontains=search)
         if filter_genres:
             queryset = queryset.filter(genres__id__in=filter_genres)
         if filter_rating:

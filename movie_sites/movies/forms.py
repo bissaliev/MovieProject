@@ -17,9 +17,9 @@ class CommentForm(forms.ModelForm):
         model = Comment
         fields = ("name", "email", "text")
         widgets = {
-            "name": forms.TextInput(attrs={"class": "form-control border"}),
-            "email": forms.EmailInput(attrs={"class": "form-control border"}),
-            "text": forms.Textarea(attrs={"class": "form-control border"})
+            "name": forms.TextInput(attrs={"class": "form-control border", "placeholder": "Имя"}),
+            "email": forms.EmailInput(attrs={"class": "form-control border", "placeholder": "Email"}),
+            "text": forms.Textarea(attrs={"class": "form-control border", "placeholder": "Ваш комментарий"})
         }
 
 
@@ -77,7 +77,6 @@ class FilterMovieForm(forms.Form):
             ("-rating", "На убывание")
         )),
     )
-    search = forms.CharField(required=False, label="Поиск")
     sort = forms.ChoiceField(
         choices=SORT_CHOICES,
         widget=forms.Select,
@@ -105,7 +104,7 @@ class FilterMovieForm(forms.Form):
     class Meta:
         fields = (
             "name", "release_year", "rating", "genres", "years", "rating",
-            "filter_countries", "search"
+            "filter_countries"
         )
 
 
