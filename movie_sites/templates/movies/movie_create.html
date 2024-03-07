@@ -1,23 +1,59 @@
 {% extends 'base.html' %}
+{% load movie_tag %}
 {% block title %}{{title}}{% endblock title %}
 {% block content %}
-<div class="my-5">
-  <div class="container">
-    <div class="row justify-content-center my-md-5" style="border: 1px solid black;">
-      <div class="py-md-3" style="border: 1px solid black;">
-        <h1 style="text-align: center;">Создание персоны</h1>
-      </div>
-        <div class="justify-content-center py-md-5" style="border: 1px solid black;">
-          <form action="{% url 'movies:movie_create' %}" method="post" enctype="multipart/form-data">
-            <div>
-              {% csrf_token %}
-              {{form.as_p}}
-              {{movie_formset}}
-            </div>
-            <button type="submit" class="btn btn-primary">Сохранить</button>
-          </form>
+<div class="container">
+    <div class="card">
+        <div class="card-body">
+            <h5 class="card-title">Создание фильма</h5>
+            <form action="{% url 'movies:movie_create' %}" method="post" enctype="multipart/form-data">
+                <div>
+                    {% csrf_token %}
+
+                    <div class="input-group mb-3">
+                        {{form.name|addclass:'form-control'}}
+                        <div class="input-group w-25">
+                            <label class="input-group-text" for="inputGroupSelect01">{{form.release_year.label}}</label>
+                            {{form.release_year|addclass:'form-select'}}
+                        </div>
+                    </div>
+
+                    <div class="input-group mb-3">
+                        <div class="input-group w-50">
+                            {{form.poster|addclass:'form-control'}}
+                        </div>
+    
+                        <div class="input-group w-50">
+                            <label class="input-group-text" for="inputGroupSelect01">{{form.category.label}}</label>
+                            {{form.category|addclass:'form-control'}}
+                        </div>
+                    </div>
+
+                    <div class="input-group mb-3 justify-content-between ">
+                        
+                        <div class="input-group mb-3 w-25">
+                            <label class="input-group-text" for="inputGroupSelect01">{{form.genres.label}}</label>
+                            {{form.genres|addclass:'form-select'}}
+                        </div>
+                        <div class="input-group mb-3 w-25">
+                            <label class="input-group-text" for="inputGroupSelect01">{{form.countries.label}}</label>
+                            {{form.countries|addclass:'form-control'}}
+                        </div>
+                        <div class="input-group mb-3 w-25">
+                            <label class="input-group-text" for="inputGroupSelect01">{{form.directors.label}}</label>
+                            {{form.directors|addclass:'form-control'}}
+                        </div>
+                    </div>
+
+                    {{movie_formset}}
+                    <div class="input-group my-3">
+                        {{form.description|addclass:'form-control'}}
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary">Сохранить</button>
+            </form>
         </div>
     </div>
-  </div>
 </div>
+
 {% endblock %}

@@ -22,8 +22,10 @@
     <div class="mt-3">
         {% for comment in object.get_comments %}
             <div class="card mb-3">
+                <div class="card-header">
+                    <h5 class="">{{comment.name}}</h5>
+                </div>
                 <div class="card-body">
-                    <h5 class="card-title ps-3">{{comment.name}}</h5>
                     <p class="card-text ps-3">{{comment.text}}</p>
                     <div class="ps-3">
                         <a href="#formComment" onclick="addComment('{{comment.name}}', '{{comment.id}}')" class="btn btn-primary">Ответить</a>
@@ -51,8 +53,8 @@
 
                 {% for com in comment.children.all %}
                     <div class="card text-bg-secondary me-1 me-lg-5 mb-1 mb-lg-3 w-75 ms-auto">
+                    <div class="card-header"><h5 class="">{{com.name}}</h5></div>
                     <div class="card-body">
-                        <h5 class="card-title">{{com.name}}</h5>
                         <p class="card-text">{{com.text}}</p>
                         {% if user.is_authenticated %}
                             {% get_status_vote com request.user as vote %}

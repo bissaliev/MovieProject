@@ -11,6 +11,10 @@
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                     <li class="nav-item">
+                        <a class="nav-link active" aria-current="page" href="{% url 'movies:movie_create' %}">Создать фильм</a>
+                    </li>
+
+                    <li class="nav-item">
                         <a class="nav-link active" aria-current="page" href="{% url 'movies:index' %}">Главная</a>
                     </li>
 
@@ -59,9 +63,6 @@
                     </li>
                 </ul>
                 <form action="{% url 'movies:movie_search' %}" class="d-flex" role="search">
-                    {% comment %} {{filter_form.search.label}} {% endcomment %}
-                    {% comment %} {{filter_form.search}} {% endcomment %}
-                    {% comment %} {{search_form.s}} {% endcomment %}
                     <input class="form-control me-2" type="search" placeholder="Поиск" aria-label="Поиск" name="s">
                     <button class="btn btn-outline-success" type="submit">Поиск</button>
                 </form>

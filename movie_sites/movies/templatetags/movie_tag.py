@@ -6,6 +6,15 @@ from ..models import Category, Movie, ContentType, LikeDislike, Bookmark
 register = template.Library()
 
 
+def silence_without_field(fn):
+    def wrapped(field, attr):
+        if not field:
+            return ""
+        return fn(field, attr)
+
+    return wrapped
+
+
 @register.simple_tag()
 def get_categories():
     """
@@ -86,3 +95,9 @@ def param_replace(context, **kwargs):
 def addclass(field, css):
     """Функция принимает класс стиля CSS и добавляет их полю."""
     return field.as_widget(attrs={'class': css})
+
+
+@register.filter("add_label_class")
+# @silence_without_field
+def add_label_class(field, css_class):
+    return field.label_tag(attrs={"class": css_class})

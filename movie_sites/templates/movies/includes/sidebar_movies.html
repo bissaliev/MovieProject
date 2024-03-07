@@ -3,26 +3,117 @@
 {% load thumbnail %}
 <form method="get" name="filter">
     <div>
+        <div class="input-group mb-3">
+            <select name="sort" id="id_sort" class="form-select">
+                <optgroup label="по заголовку">
+                    <option value="name">А-Я</option>
+                    <option value="-name">Я-А</option>
+                </optgroup>
+                <optgroup label="по годам">
+                    <option value="release_year">На возрастание</option>
+                    <option value="-release_year">На убывание</option>
+                </optgroup>
+                <optgroup label="по рейтингу">
+                    <option value="rating">На возрастание</option>
+                    <option value="-rating">На убывание</option>
+                </optgroup>
+            </select>
+            <button class="btn btn-outline-primary" type="submit">Сортировать</button>
+        </div> <!--сортировка-->
+        <div class="input-group justify-content-between">
+            <div id="id_filter_genres" class="form-check mb-3 ps-0">
+                {{filter_form.filter_genres.label}}
+                <div>
+                    <input type="checkbox" name="filter_genres" value="6" id="id_filter_genres_0" class="btn-check">
+                    <label for="id_filter_genres_0" class="btn btn-outline-primary btn-sm mb-1">Биография</label>
+                </div>
+                <div>
+                    <input type="checkbox" name="filter_genres" value="1" id="id_filter_genres_1" class="btn-check">
+                    <label for="id_filter_genres_1" class="btn btn-outline-primary btn-sm mb-1">Боевик</label>
+                </div>
+                <div>
+                    <input type="checkbox" name="filter_genres" value="10" id="id_filter_genres_2" class="btn-check">
+                    <label for="id_filter_genres_2" class="btn btn-outline-primary btn-sm mb-1">Вестерн</label>
+                </div>
+                <div>
+                    <input type="checkbox" name="filter_genres" value="9" id="id_filter_genres_3" class="btn-check">
+                    <label for="id_filter_genres_3" class="btn btn-outline-primary btn-sm mb-1">Детектив</label>
+                </div>
+                <div>
+                    <input type="checkbox" name="filter_genres" value="5" id="id_filter_genres_4" class="btn-check">
+                    <label for="id_filter_genres_4" class="btn btn-outline-primary btn-sm mb-1">Драма</label>
+                </div>
+                <div>
+                    <input type="checkbox" name="filter_genres" value="7" id="id_filter_genres_5" class="btn-check">
+                    <label for="id_filter_genres_5" class="btn btn-outline-primary btn-sm mb-1">История</label>
+                </div>
+                <div>
+                    <input type="checkbox" name="filter_genres" value="4" id="id_filter_genres_6" class="btn-check">
+                    <label for="id_filter_genres_6" class="btn btn-outline-primary btn-sm mb-1"> btn-smКомедия</label>
+                </div>
+                <div>
+                    <input type="checkbox" name="filter_genres" value="8" id="id_filter_genres_7" class="btn-check">
+                    <label for="id_filter_genres_7" class="btn btn-outline-primary btn-sm mb-1">Криминал</label>
+                </div>
+                <div>
+                    <input type="checkbox" name="filter_genres" value="12" id="id_filter_genres_8" class="btn-check">
+                    <label for="id_filter_genres_8" class="btn btn-outline-primary btn-sm mb-1">Приключения</label>
+                </div>
+                <div>
+                    <input type="checkbox" name="filter_genres" value="3" id="id_filter_genres_9" class="btn-check">
+                    <label for="id_filter_genres_9" class="btn btn-outline-primary btn-sm mb-1">Триллер</label>
+                </div>
+                <div>
+                    <input type="checkbox" name="filter_genres" value="11" id="id_filter_genres_10" class="btn-check">
+                    <label for="id_filter_genres_10" class="btn btn-outline-primary btn-sm mb-1">Ужасы</label>
+                </div>
+                <div>
+                    <input type="checkbox" name="filter_genres" value="2" id="id_filter_genres_11" class="btn-check">
+                    <label for="id_filter_genres_11" class="btn btn-outline-primary btn-sm mb-1">Фантастика</label>
+                </div>
+                <div>
+                    <input type="checkbox" name="filter_genres" value="13" id="id_filter_genres_12" class="btn-check">
+                    <label for="id_filter_genres_12" class="btn btn-outline-primary btn-sm mb-1">Фэнтези</label>
+                </div>
+            </div> <!--фильтр жанров-->
 
-        <p>
-            {{filter_form.sort.label}}
-            {{filter_form.sort}}
-        </p>
+            <div id="id_filter_countries" class="form-check mb-3">
+                {{filter_form.filter_countries.label}}
+                <div>
+                    <input type="checkbox" name="filter_countries" value="2" id="id_filter_countries_0" class="btn-check">
+                    <label for="id_filter_countries_0" class="btn btn-outline-primary btn-sm mb-1">Великобритания</label>
+                </div>
+                <div>
+                    <input type="checkbox" name="filter_countries" value="5" id="id_filter_countries_1" class="btn-check">
+                    <label for="id_filter_countries_1" class="btn btn-outline-primary btn-sm mb-1">Италия</label>
+                </div>
+                <div>
+                    <input type="checkbox" name="filter_countries" value="7" id="id_filter_countries_2" class="btn-check">
+                    <label for="id_filter_countries_2" class="btn btn-outline-primary btn-sm mb-1">Канада</label>
+                </div>
+                <div>
+                    <input type="checkbox" name="filter_countries" value="6" id="id_filter_countries_3" class="btn-check">
+                    <label for="id_filter_countries_3" class="btn btn-outline-primary btn-sm mb-1">Мексика</label>
+                </div>
+                <div>
+                    <input type="checkbox" name="filter_countries" value="3" id="id_filter_countries_4" class="btn-check">
+                    <label for="id_filter_countries_4" class="btn btn-outline-primary btn-sm mb-1">Россия</label>
+                </div>
+                <div>
+                    <input type="checkbox" name="filter_countries" value="1" id="id_filter_countries_5" class="btn-check">
+                    <label for="id_filter_countries_5" class="btn btn-outline-primary btn-sm mb-1">США</label>
+                </div>
+                <div>
+                    <input type="checkbox" name="filter_countries" value="4" id="id_filter_countries_6" class="btn-check">
+                    <label for="id_filter_countries_6" class="btn btn-outline-primary btn-sm mb-1">Сша</label>
+                </div>
+            </div> <!--фильтр стран-->
+        </div> <!--жанры и страны-->
 
-        <p>
-            {{filter_form.filter_genres.label}}
-            {{filter_form.filter_genres}}
-        </p>
-
-        <p>
-            {{filter_form.filter_countries.label}}
-            {{filter_form.filter_countries}}
-        </p>
-
-        <p>
-            {{filter_form.filter_years.label}}
-            {{filter_form.filter_years}}
-        </p>
+        <div class="input-group">
+            {{filter_form.start_year|addclass:"form-select"}}
+            {{filter_form.end_year|addclass:"form-select"}}
+        </div>
 
         <p>
             {{filter_form.filter_rating.label}}

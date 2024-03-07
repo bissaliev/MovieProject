@@ -1,5 +1,4 @@
 from django.db.models import Q
-from django.db.models.query import QuerySet
 
 from .models import Person, MovieActor
 from .forms import FilterPersonForm, FilterMovieForm
@@ -56,15 +55,19 @@ class FilterOrderMovieMixin:
         filter_genres = self.request.GET.getlist("filter_genres")
         filter_rating = self.request.GET.get("filter_rating")
         filter_countries = self.request.GET.getlist("filter_countries")
-        filter_years = self.request.GET.getlist("filter_years")
+        start_year = self.request.GET.get("start_year")
+        end_year = self.request.GET.get("end_year")
         if filter_genres:
             queryset = queryset.filter(genres__id__in=filter_genres)
         if filter_rating:
             queryset = queryset.filter(rating__gte=filter_rating)
-        if filter_years:
-            queryset = queryset.filter(release_year__in=filter_years)
         if filter_countries:
             queryset = queryset.filter(countries__id__in=filter_countries)
+        if start_year and end_year:
+            queryset = queryset.filter(
+                release_year__gte=start_year,
+                release_year__lte=end_year
+            )
         sort = self.request.GET.getlist("sort")
         return queryset.order_by(*sort)
 

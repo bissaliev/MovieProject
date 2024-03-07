@@ -1,3 +1,5 @@
+import datetime as dt
+
 from django import forms
 from .models import (
     Person,
@@ -7,7 +9,10 @@ from .models import (
     Comment,
     MovieActor,
     Rating,
+    Category
 )
+
+year = dt.datetime.now().year
 
 
 class CommentForm(forms.ModelForm):
@@ -33,6 +38,11 @@ class PersonForm(forms.ModelForm):
 
 class MovieForm(forms.ModelForm):
     """Форма для создания фильма."""
+    name = forms.CharField(widget=forms.TextInput(attrs={"placeholder": "Название фильма"}))
+    description = forms.CharField(widget=forms.Textarea(attrs={"placeholder": "Напишите описание фильма"}))
+    genres = forms.ModelChoiceField(queryset=Genre.objects.all(), widget=forms.SelectMultiple, label="Жанры")
+    category = forms.ModelChoiceField(queryset=Category.objects.all(), widget=forms.Select, label="Категория", empty_label="Выберете категорию")
+
     class Meta:
         model = Movie
         fields = "__all__"
@@ -58,11 +68,8 @@ class FilterMovieForm(forms.Form):
     Форма для отображения полей для фильтрации, сортировки и поиску фильмов.
     """
 
-    CHOICE_YEARS = [
-        (i, i) for i in sorted(list(set(
-            Movie.objects.values_list("release_year", flat=True)
-        )))
-    ]
+    CHOICE_YEARS = [(i, i) for i in range(year, year-100, -1)]
+
     SORT_CHOICES = (
         ("по заголовку", (
             ("name", "А-Я"),
@@ -92,19 +99,17 @@ class FilterMovieForm(forms.Form):
         widget=forms.CheckboxSelectMultiple,
         label="Страны"
     )
-    filter_years = forms.MultipleChoiceField(
-        choices=CHOICE_YEARS, widget=forms.CheckboxSelectMultiple,
-        label="Года"
-    )
     filter_rating = forms.MultipleChoiceField(
         choices=Rating.RATING_CHOICES, widget=forms.CheckboxSelectMultiple,
         label="Рейтинг"
     )
+    start_year = forms.ChoiceField(choices=reversed(CHOICE_YEARS), initial=1950)
+    end_year = forms.ChoiceField(initial=year, choices=CHOICE_YEARS)
 
     class Meta:
         fields = (
-            "name", "release_year", "rating", "genres", "years", "rating",
-            "filter_countries"
+            "name", "release_year", "rating", "genres", "rating",
+            "filter_countries", "start_year", "end_year"
         )
 
 
@@ -114,7 +119,9 @@ MovieFormSet = forms.inlineformset_factory(
 
 
 class FilterPersonForm(forms.Form):
-    """Форма для отображения полей для фильтрации, сортировки и поиску персон."""
+    """
+    Форма для отображения полей для фильтрации, сортировки и поиску персон.
+    """
 
     PERSON_PROFILE_CHOICES = [
         ("actors", "Актеры"),
@@ -127,7 +134,11 @@ class FilterPersonForm(forms.Form):
             ("birthdate", "На возрастание"), ("-birthdate", "На убывание")
         ))
     ]
-    search = forms.CharField(required=False, label="Поиск")
+    search = forms.CharField(
+        required=False,
+        label="Поиск",
+        widget=forms.TextInput(attrs={"placeholder": "Поиск"})
+    )
     profile = forms.ChoiceField(
         choices=PERSON_PROFILE_CHOICES,
         label="Категория",

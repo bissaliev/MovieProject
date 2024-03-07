@@ -13,7 +13,7 @@
                     {% thumbnail object.picture "600x900" crop="center" as picture %}
                         <img src="{{picture.url}}" class="img-fluid rounded-start" alt="Photo of actor">
                     {% endthumbnail %}
-                </div>  <!-- фото фильма -->
+                </div>  <!-- фото персоны -->
 
                 <div class="col-md-8">
                     <div class="card-body">
@@ -62,7 +62,7 @@
                             </ul>
                         </p>
                     </div>
-                </div>  <!-- данные о фильме -->
+                </div>  <!-- данные о персоне -->
 
             </div>
         </div>  <!-- верхний блок-->
@@ -70,36 +70,49 @@
         <div class="card-body">
             <h5 class="card-title">Об актере {{object.first_name}} {{object.last_name}}</h5>
             <p class="card-text">{{ object.description|linebreaks }}</p>
-        </div> <!-- текстовое описание фильма -->
+        </div> <!-- текстовое описание персоны -->
 
-        <div class="row mx-2">
+        <div class="mx-4 mb-4">
             <h3>Фильмография:</h3>
-            {% for movie in object.actor_movies.all %}
-            <div style="text-align: center; width: 200px;">
-                <a href="{{movie.get_absolute_url}}">
-                    {% thumbnail movie.poster "190x190" crop="center" as poster %}
-                        <img src="{{poster.url}}" class="img-fluid" alt="">
-                    {% endthumbnail %}
-                </a><br>
-                <span style="font-size: small;">{{movie.name}}</span>
-                {{movie.role}}
+            <div class="row row-cols-1 row-cols-md-6 g-2">
+                {% for movie in object.actor_movies.all %}
+                <div class="col">
+                    <div class="card h-100">
+                        {% thumbnail movie.poster "150x150" crop="center" as poster %}
+                            <img src="{{poster.url}}" class="card-img-top" alt="">
+                        {% endthumbnail %}
+                        <div class="card-body py-0">
+                            {% comment %} {{movie.name}} {% endcomment %}
+                            {% comment %} <h5 class="card-title">Заголовок карточки</h5> {% endcomment %}
+                            <p class="card-text py-0 mb-0">{{movie.name}}</p>
+                            <div class="card-footer py-0 mt-0">
+                                <small class="text-body-secondary">{{movie.role}}</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
             </div>
-            {% endfor %}
-            {% for movie in object.director_movies.all %}
-            <div style="text-align: center; width: 200px;">
-                <a href="{{movie.get_absolute_url}}">
-                    {% thumbnail movie.poster "190x190" crop="center" as poster %}
-                        <img src="{{poster.url}}" class="img-fluid" alt="">
-                    {% endthumbnail %}
-                </a><br>
-                <span style="font-size: small;">{{movie.name}}</span>
-            </div>
-            {% endfor %}
-        </div>
-    
-    </div>  <!-- карточка фильма -->
 
-    <div class="container-fluid p-0">{% include 'includes/comments.html' %}</div>  <!-- комментарии -->
+            <div class="row row-cols-1 row-cols-md-6 g-2">
+                {% for movie in object.director_movies.all %}
+                <div class="col">
+                    <div class="card h-100">
+                        {% thumbnail movie.poster "190x190" crop="center" as poster %}
+                            <img src="{{poster.url}}" class="card-img-top" alt="">
+                        {% endthumbnail %}
+                        <div class="card-body py-0">
+                            {% comment %} {{movie.name}} {% endcomment %}
+                            {% comment %} <h5 class="card-title">Заголовок карточки</h5> {% endcomment %}
+                            <p class="card-text py-0 mb-0">{{movie.name}}</p>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+    
+    </div>  <!-- карточка персоны -->
+
 </div>  <!--container-->
 
 {% endblock %}
