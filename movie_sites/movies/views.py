@@ -6,6 +6,7 @@ from django.shortcuts import redirect
 from django.views.generic import ListView, CreateView, DetailView
 from django.views.generic.base import View
 from django.urls import reverse_lazy
+from django.forms.models import inlineformset_factory
 
 
 from .models import (
@@ -13,14 +14,15 @@ from .models import (
     Movie,
     Rating,
     LikeDislike,
-    Bookmark
+    Bookmark,
+    MovieActor
 )
 from .forms import (
     PersonForm,
     MovieForm,
     CommentForm,
     RatingForm,
-    MovieFormSet,
+    MovieActorForm
 )
 from .utils import get_ip
 from .filters import (
@@ -75,40 +77,50 @@ class MovieSearchView(ListView):
         return Movie.objects.filter(name__icontains=search)
 
 
-class MovieCreateView(CreateView):
+class MovieCreateView(CreateView):  # добавить функционал чтобы добавлять мог только администратор
     """Создание нового фильма."""
 
     form_class = MovieForm
     template_name = "movies/movie_create.html"
-    success_url = reverse_lazy("movies:index")
     extra_context = {"title": "Создание нового фильма"}
+    formset = inlineformset_factory(
+        Movie, MovieActor, form=MovieActorForm, extra=2)
 
-    def get(self, request, *args, **kwargs):
-        self.object = None
-        form_class = self.get_form_class()
-        form = self.get_form(form_class)
-        movie_formset = MovieFormSet()
-        return self.render_to_response(
-            self.get_context_data(form=form, movie_formset=movie_formset)
-        )
+    def get_context_data(self, **kwargs):
+        """Добавляем в контекст formset."""
+        context = super().get_context_data(**kwargs)
+        context["movie_formset"] = self.formset
+        return context
 
     def post(self, request, *args, **kwargs):
         self.object = None
-        form_class = self.get_form_class()
-        form = self.get_form(form_class)
-        movie_formset = MovieFormSet(request.POST, request.FILES)
+        form = self.get_form(self.get_form_class())
+        movie_formset = self.formset(
+            request.POST or None, request.FILES or None)
+
         if (form.is_valid()) and (movie_formset.is_valid()):
             return self.form_valid(form, movie_formset)
-        else:
-            return self.form_invalid(form, movie_formset)
+
+        return self.form_invalid(form, movie_formset)
 
     def form_valid(self, form, movie_formset):
+        """
+        Если данные проходят валидацию, то мы сохраняем сначала объект модели
+        Movie; Затем связываем объект Movie и объект Person через промежуточную
+        модель MovieActor.
+        """
+
         self.object = form.save()
         movie_formset.instance = self.object
         movie_formset.save()
         return super(MovieCreateView, self).form_valid(form)
 
     def form_invalid(self, form, movie_formset):
+        """
+        Если данные не проходят валидацию возвращаем введенные данные
+        на страницу пользователя.
+        """
+
         return self.render_to_response(
             self.get_context_data(form=form, movie_formset=movie_formset)
         )

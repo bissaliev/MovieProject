@@ -30,6 +30,14 @@ class CommentForm(forms.ModelForm):
 
 class PersonForm(forms.ModelForm):
     """Форма для создания персоны."""
+    first_name = forms.CharField(
+        widget=forms.TextInput(attrs={"placeholder": "Имя"}))
+    last_name = forms.CharField(
+        widget=forms.TextInput(attrs={"placeholder": "Фамилия"}))
+    description = forms.CharField(
+        widget=forms.Textarea(
+            attrs={"placeholder": "Введите текс биографии", "rows": 18})
+    )
 
     class Meta:
         model = Person
@@ -38,10 +46,25 @@ class PersonForm(forms.ModelForm):
 
 class MovieForm(forms.ModelForm):
     """Форма для создания фильма."""
-    name = forms.CharField(widget=forms.TextInput(attrs={"placeholder": "Название фильма"}))
-    description = forms.CharField(widget=forms.Textarea(attrs={"placeholder": "Напишите описание фильма"}))
-    genres = forms.ModelChoiceField(queryset=Genre.objects.all(), widget=forms.SelectMultiple, label="Жанры")
-    category = forms.ModelChoiceField(queryset=Category.objects.all(), widget=forms.Select, label="Категория", empty_label="Выберете категорию")
+
+    name = forms.CharField(
+        widget=forms.TextInput(attrs={"placeholder": "Название фильма"})
+    )
+    description = forms.CharField(
+        widget=forms.Textarea(
+            attrs={"placeholder": "Напишите описание фильма"})
+    )
+    genres = forms.ModelMultipleChoiceField(
+        queryset=Genre.objects.all(),
+        widget=forms.SelectMultiple,
+        label="Жанры"
+    )
+    category = forms.ModelChoiceField(
+        queryset=Category.objects.all(),
+        widget=forms.Select,
+        label="Категория",
+        empty_label="Выберете категорию"
+    )
 
     class Meta:
         model = Movie
@@ -111,11 +134,6 @@ class FilterMovieForm(forms.Form):
             "name", "release_year", "rating", "genres", "rating",
             "filter_countries", "start_year", "end_year"
         )
-
-
-MovieFormSet = forms.inlineformset_factory(
-    Movie, MovieActor, form=MovieActorForm
-)
 
 
 class FilterPersonForm(forms.Form):
