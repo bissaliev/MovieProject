@@ -1,7 +1,7 @@
 from django.contrib import messages
 from django.db.models import Avg
 from django.contrib.contenttypes.models import ContentType
-from django.http import HttpResponse
+from django.db.models import Q
 from django.shortcuts import redirect
 from django.views.generic import ListView, CreateView, DetailView
 from django.views.generic.base import View
@@ -56,11 +56,7 @@ class MovieDetailView(DetailView):
         """
 
         context = super().get_context_data(**kwargs)
-        instance = self.object.ratings.filter(ip=get_ip(self.request))
-        if instance:
-            context["rating_form"] = RatingForm(instance=instance[0])
-        else:
-            context["rating_form"] = RatingForm()
+        context["rating_form"] = RatingForm()
         context["form"] = CommentForm()
         return context
 
@@ -74,7 +70,23 @@ class MovieSearchView(ListView):
 
     def get_queryset(self):
         search = self.request.GET.get("s")
-        return Movie.objects.filter(name__icontains=search)
+        if search:
+            return super().get_queryset().filter(name__icontains=search)
+        return super().get_queryset()
+
+
+class PersonSearchView(ListView):
+    """класс представление для поиска персон."""
+
+    model = Person
+    template_name = "movies/person_list.html"
+    paginate_by = 8
+
+    def get_queryset(self):
+        search = self.request.GET.get("s")
+        return Person.objects.filter(
+            Q(first_name__icontains=search) | Q(last_name__icontains=search)
+        )
 
 
 class MovieCreateView(CreateView):  # добавить функционал чтобы добавлять мог только администратор

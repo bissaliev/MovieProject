@@ -1,7 +1,7 @@
 from django.db.models import Q
 
-from .models import Person, MovieActor
-from .forms import FilterPersonForm, FilterMovieForm
+from .forms import FilterMovieForm, FilterPersonForm
+from .models import MovieActor, Person
 
 
 class FilterOrderPersonMixin:
@@ -45,34 +45,38 @@ class FilterOrderMovieMixin:
     сортировка по названию(А-Я, Я-А), рейтингу(На убывание и возрастание),
     году производства(На возрастание и убывание).
     """
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        current_genre = [int(i) for i in self.request.GET.getlist("genres")]
+        print(self.request.resolver_match.view_name)
+        context["current_genre"] = current_genre
         context["filter_form"] = FilterMovieForm(self.request.GET)
         return context
 
     def get_queryset(self):
         queryset = super().get_queryset()
-        filter_genres = self.request.GET.getlist("filter_genres")
-        filter_rating = self.request.GET.get("filter_rating")
-        filter_countries = self.request.GET.getlist("filter_countries")
+
+        genres = self.request.GET.getlist("genres")
+        rating = self.request.GET.get("rating")
+        countries = self.request.GET.getlist("countries")
         start_year = self.request.GET.get("start_year")
         end_year = self.request.GET.get("end_year")
-        if filter_genres:
-            queryset = queryset.filter(genres__id__in=filter_genres)
-        if filter_rating:
-            queryset = queryset.filter(rating__gte=filter_rating)
-        if filter_countries:
-            queryset = queryset.filter(countries__id__in=filter_countries)
+        if genres:
+            queryset = queryset.filter(genres__id__in=genres)
+        if rating:
+            queryset = queryset.filter(rating__gte=rating)
+        if countries:
+            queryset = queryset.filter(countries__id__in=countries)
         if start_year and end_year:
             queryset = queryset.filter(
-                release_year__gte=start_year,
-                release_year__lte=end_year
+                release_year__range=(start_year, end_year)
             )
         sort = self.request.GET.getlist("sort")
         return queryset.order_by(*sort)
 
 
-class FilterOrderMultipleMixin:
+class FilterOrderMultipleMixin:  # не SOLID исправить
     """
     Миксин для динамического определения фильтра для персон или фильмов
     (FilterOrderPersonMixin, FilterOrderMovieMixin) для класса представления

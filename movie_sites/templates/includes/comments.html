@@ -31,22 +31,32 @@
                         <a href="#formComment" onclick="addComment('{{comment.name}}', '{{comment.id}}')" class="btn btn-primary">Ответить</a>
                         {% if user.is_authenticated %}
                             {% get_status_vote comment request.user as vote %}
-                            <a class="btn btn-primary" href="{% url 'movies:vote_comment' comment.id '1' %}">
+
+                            <a class="btn btn-primary position-relative ms-2" href="{% url 'movies:vote_comment' comment.id '1' %}">
                                 {% if vote == 1 %}
                                     <img style="width: 20px; height: 20px;" src="{% static 'img/like2_1.svg' %}" alt="За стеклом">
                                 {% else %}
                                     <img style="width: 20px; height: 20px;" src="{% static 'img/like2_2.svg' %}" alt="За стеклом">
                                 {% endif %}
-                                {{comment.get_like_count}}
+                                <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                                    {{comment.get_like_count}}
+                                    <span class="visually-hidden">лайк</span>
+                                </span>
                             </a>
-                            <a class="btn btn-primary" href="{% url 'movies:vote_comment' comment.id '-1' %}">
+
+                            <a class="btn btn-primary position-relative ms-2" href="{% url 'movies:vote_comment' comment.id '-1' %}">
                                 {% if vote == -1 %}
                                     <img style="width: 20px; height: 20px;" src="{% static 'img/dislike1_1.svg' %}" alt="За стеклом">
                                 {% else %}
                                     <img style="width: 20px; height: 20px;" src="{% static 'img/dislike1_2.svg' %}" alt="За стеклом">
                                 {% endif %}
-                                {{comment.get_dislike_count}}
+                                <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                                    {{comment.get_dislike_count}}
+                                    <span class="visually-hidden">дизлайк</span>
+                                </span>
                             </a>
+
+                            <span class="badge bg-secondary ms-5">{{comment.pub_date|timesince}}</span>
                         {% endif %}
                     </div>
                 </div>
@@ -58,22 +68,32 @@
                         <p class="card-text">{{com.text}}</p>
                         {% if user.is_authenticated %}
                             {% get_status_vote com request.user as vote %}
-                            <a class="btn btn-primary" href="{% url 'movies:vote_comment' com.id '1' %}">
+
+                            <a class="btn btn-primary position-relative ms-2" href="{% url 'movies:vote_comment' com.id '1' %}">
                                 {% if vote == 1 %}
                                     <img style="width: 20px; height: 20px;" src="{% static 'img/like2_1.svg' %}" alt="За стеклом">
                                 {% else %}
                                     <img style="width: 20px; height: 20px;" src="{% static 'img/like2_2.svg' %}" alt="За стеклом">
                                 {% endif %}
-                                {{com.get_like_count}}
+                                <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                                    {{com.get_like_count}}
+                                    <span class="visually-hidden">лайк</span>
+                                </span>
                             </a>
-                            <a class="btn btn-primary" href="{% url 'movies:vote_comment' com.id '-1' %}">
+
+                            <a class="btn btn-primary position-relative ms-2" href="{% url 'movies:vote_comment' com.id '-1' %}">
                                 {% if vote == -1 %}
                                     <img style="width: 20px; height: 20px;" src="{% static 'img/dislike1_1.svg' %}" alt="За стеклом">
                                 {% else %}
                                     <img style="width: 20px; height: 20px;" src="{% static 'img/dislike1_2.svg' %}" alt="За стеклом">
                                 {% endif %}
-                                {{com.get_dislike_count}}
+                                <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                                    {{com.get_dislike_count}}
+                                    <span class="visually-hidden">дизлайк</span>
+                                </span>
                             </a>
+
+                            <span class="badge bg-dark ms-5">{{com.pub_date|timesince}}</span>
                         {% endif %}
                     </div>  <!-- card-body -->
                     </div> <!-- вывод дочерних комментариев -->

@@ -38,6 +38,8 @@ INSTALLED_APPS = [
     "rest_framework",
     "djoser",
     "debug_toolbar",
+    "django_filters",
+    "widget_tweaks"
 ]
 
 MIDDLEWARE = [

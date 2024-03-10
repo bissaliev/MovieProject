@@ -1,18 +1,44 @@
 """Пользовательские теги."""
 
 from django import template
-from ..models import Category, Movie, ContentType, LikeDislike, Bookmark
+from ..models import Category, Movie, ContentType, LikeDislike, Bookmark, Genre, Country
+from ..utils import get_ip
 
 register = template.Library()
 
 
-def silence_without_field(fn):
-    def wrapped(field, attr):
-        if not field:
-            return ""
-        return fn(field, attr)
+@register.simple_tag()
+def your_rating(request, object):
+    """Оперделяет ставил ли пользователь оценку фильму."""
 
-    return wrapped
+    rating = object.ratings.filter(ip=get_ip(request))
+    if rating:
+        return rating[0].score
+
+@register.filter()
+def get_range(value):
+    """
+    Фильтр возвращает последовательность чисел для вывода их в шаблоне.
+    """
+    return range(1, value)
+
+
+@register.simple_tag()
+def get_genres():
+    """
+    Функция возвращает Queryset (список все жанров) для вывода их в шаблоне.
+    """
+
+    return Genre.objects.all()
+
+
+@register.simple_tag()
+def get_countries():
+    """
+    Функция возвращает Queryset (список все стран) для вывода их в шаблоне.
+    """
+
+    return Country.objects.all()
 
 
 @register.simple_tag()
@@ -98,6 +124,6 @@ def addclass(field, css):
 
 
 @register.filter("add_label_class")
-# @silence_without_field
 def add_label_class(field, css_class):
+    """Функция принимает класс стиля CSS и добавляет label поля."""
     return field.label_tag(attrs={"class": css_class})

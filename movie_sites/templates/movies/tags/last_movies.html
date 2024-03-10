@@ -2,17 +2,22 @@
 <div class="deal-leftmk left-side">
     <h3 class="sear-head editContent">Последние добавленные</h3>
     {% for movie in last_movies %}
-        <div class="special-sec1 row mt-3 editContent">
-            <div class="img-deals col-md-4">
-                {% thumbnail movie.poster "100x100" crop="center" as poster %}
-                <img src="{{poster.url}}" class="img-fluid" alt="">
-                {% endthumbnail%}
-            </div>
-            <div class="img-deal1 col-md-4">
-                <a href="{{movie.get_absolute_url}}" class="editContent" >
-                    <h3 class="editContent">{{movie.name}}</h3>
-                </a>
+        <div class="card mb-3">
+            <div class="row g-0">
+                <div class="col-md-4">
+                    {% thumbnail movie.poster "100x100" crop="center" as poster %}
+                        <img src="{{poster.url}}" class="img-fluid rounded-start h-100" alt="">
+                    {% endthumbnail%}
+                </div>
+                <div class="col-md-8">
+                    <div class="card-body">
+                        <h5 class="card-title">{{movie.name}}</h5>
+                        <p class="card-text"></p>
+                        <p class="card-text"><small class="text-body-secondary">{{ movie.pub_date|timesince}}</small></p>
+                    </div>
+                </div>
             </div>
         </div>
+
     {% endfor %}
 </div>

@@ -9,9 +9,13 @@
 
         <div class="card card_movie h-100">
 
-            {% thumbnail movie.poster "390x450" crop="center" as poster %}
-                <img src="{{poster.url}}"alt="" width="{{poster.width}}" height="{{poster.height}}" class="card-img-top" alt="...">
-            {% endthumbnail %}
+            {% if movie.poster %}
+                {% thumbnail movie.poster "390x450" crop="center" as poster %}
+                    <img src="{{poster.url}}"alt="" width="{{poster.width}}" height="{{poster.height}}" class="card-img-top" alt="...">
+                {% endthumbnail %}
+            {% else %}
+                <img src="{% static 'img/Philosopher.jpg' %}" width="600" height="900" class="img-fluid rounded-start" alt="Постер">
+            {% endif %}
 
             <div class="card-body">
                 
@@ -19,7 +23,7 @@
 
                 <div class="d-flex justify-content-between">
 
-                    <p class="card-text">Рейтинг: {{movie.rating}}</p>
+                    <div class="btn btn-primary">Рейтинг: <span class="badge bg-secondary">{{ movie.rating|floatformat:"0" }}</span></div>
 
                     {% if user.is_authenticated %}
                         {% bookmark_is_exists movie user as bookmark %} <!--Определяет находится ли фильм в избранных-->

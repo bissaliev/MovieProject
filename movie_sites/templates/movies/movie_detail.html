@@ -10,18 +10,18 @@
             <div class="row g-0">
 
                 <div class="col-md-4">
-                    {% thumbnail object.poster "600x900" crop="center" as poster %}
-                        <img src="{{poster.url}}" class="img-fluid rounded-start" alt="Постер">
-                    {% endthumbnail %}
-                </div>  <!-- постер фильма -->
-
-                <div class="col-md-8">
-                    <div class="card-body">
-                        <div class="d-flex justify-content-between">
-                            <h1 class="card-title">{{object.name}}</h1>
+                    <div class="position-relative h-100">
+                        {% if object.poster %}
+                            {% thumbnail object.poster "600x900" crop="center" as poster %}
+                                <img src="{{poster.url}}" class="img-fluid rounded-start h-100" alt="Постер">
+                            {% endthumbnail %}
+                        {% else %}
+                            <img src="{% static 'img/Philosopher.jpg' %}" width="600" height="900" class="img-fluid rounded-start h-100" alt="Постер">
+                        {% endif %}
+                        <div class="position-absolute bottom-0 end-0 m-2">
                             {% if user.is_authenticated %}
                                 {% bookmark_is_exists object user as bookmark %}
-                                <a class="btn btn-primary" href="{% url 'movies:add_bookmark_movie' object.id %}">
+                                <a class="btn btn-primary shadow-lg" href="{% url 'movies:add_bookmark_movie' object.id %}">
                                     {% if bookmark %}
                                         <img style="width: 30px; height: 30px;" src="{% static 'img/bookmark_is.svg' %}" alt="За стеклом">
                                     {% else %}
@@ -29,6 +29,26 @@
                                     {% endif%}
                                 </a>
                             {% endif %}
+                        </div>
+                    </div>
+                </div>  <!-- постер фильма -->
+
+                <div class="col-md-8">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between">
+                            <h1 class="card-title">{{object.name}}</h1>
+                            <div>
+                                {% if user.is_authenticated %}
+                                    {% bookmark_is_exists object user as bookmark %}
+                                    <a class="btn btn-primary shadow-lg" href="{% url 'movies:add_bookmark_movie' object.id %}">
+                                        {% if bookmark %}
+                                            <img style="width: 30px; height: 30px;" src="{% static 'img/bookmark_is.svg' %}" alt="За стеклом">
+                                        {% else %}
+                                            <img style="width: 30px; height: 30px;" src="{% static 'img/bookmark_not.svg' %}" alt="За стеклом">
+                                        {% endif%}
+                                    </a>
+                                {% endif %}
+                            </div>
                         </div>
 
                         <p class="card-text">
@@ -73,12 +93,18 @@
                                 </li>
 
                                 <li class="mb-2">
-                                    <div>
-                                        <p><h3>Рейтинг: {{object.rating}}</h3></p>
+                                    <div class="">
+                                        <p><span class="btn btn-primary btn-lg">Рейтинг <span class="badge bg-dark">{{object.rating}}</span></span></p>
+                                        {% your_rating request object as is_ip %}  <!--Определяем какой рейтинг был поставлен пользователем раннее-->
                                         <form action="{% url 'movies:add_rating' %}" method="post" name="rating">
                                             {% csrf_token %}
                                             <input type="hidden" value="{{object.id}}" name="movie">
-                                            {{rating_form}}
+                                            <div name="score" id="id_score" class="btn-group" role="group" aria-label="rating">
+                                                {% for rating in 11|get_range %}
+                                                    <input value="{{rating}}" type="radio" class="btn-check" name="score" id="id_score_{{rating}}" autocomplete="off" {% if is_ip == rating %}checked{% endif %}>
+                                                    <label class="btn btn-outline-primary" for="id_score_{{rating}}">{{rating}}</label>
+                                                {% endfor %}
+                                            </div>
                                         </form>
                                     </div>
                                 </li>

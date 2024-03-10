@@ -1,3 +1,6 @@
+import uuid
+from pathlib import Path
+
 from django.db import models
 from django.db.models import Sum
 from django.core.validators import MaxValueValidator
@@ -9,8 +12,15 @@ from django.contrib.contenttypes.fields import (
     GenericForeignKey, GenericRelation
 )
 
+from .fields import WEBPField
+
 
 User = get_user_model()
+
+
+def get_image_folder(instance, filename):
+    """Функция для определения пути изображений."""
+    return f"{instance.__class__.__name__}/{uuid.uuid4().hex}.webp"
 
 
 class Person(models.Model):
@@ -32,11 +42,8 @@ class Person(models.Model):
         ],
     )
     description = models.TextField("Описание", blank=True, null=True)
-    picture = models.ImageField(
-        "Фото",
-        upload_to="persons/%Y/%m/%d",
-        blank=True,
-        null=True,
+    picture = WEBPField(
+        "Фото", upload_to=get_image_folder, blank=True, null=True
     )
     gender = models.CharField(
         "Гендер",
@@ -156,8 +163,8 @@ class Movie(models.Model):
     release_year = models.PositiveSmallIntegerField(
         "Год выпуска"
     )
-    poster = models.ImageField(
-        "Постер", upload_to="movies/%Y/%m/%d", null=True, blank=True
+    poster = WEBPField(
+        "Постер", upload_to=get_image_folder, null=True, blank=True
     )
     category = models.ForeignKey(
         to="Category",
