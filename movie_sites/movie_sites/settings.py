@@ -40,7 +40,8 @@ INSTALLED_APPS = [
     "djoser",
     "debug_toolbar",
     "django_filters",
-    "widget_tweaks"
+    "widget_tweaks",
+    "drf_yasg",
 ]
 
 MIDDLEWARE = [
@@ -149,4 +150,10 @@ REST_FRAMEWORK = {
 SIMPLE_JWT = {
     "ACCESS_TOKEN_LIFETIME": timedelta(days=10),
     "AUTH_HEADER_TYPES": ("Bearer",),
+}
+
+SWAGGER_SETTINGS = {
+    "SECURITY_DEFINITIONS": {
+        "Bearer": {"type": "apiKey", "name": "Authorization", "in": "header"}
+    }
 }
