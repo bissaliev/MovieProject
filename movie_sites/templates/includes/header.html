@@ -62,35 +62,23 @@
                                 <li><a class="dropdown-item" href="{% url 'users:signup' %}">Зарегистрироваться</a></li>
                             {% endif %}
                             <li><hr class="dropdown-divider"></li>
-                            <li><a class="dropdown-item" href="#">Что-то еще здесь</a></li>
+                            <li><a class="dropdown-item" href="#">Сменить пароль</a></li>
                         </ul>
                     </li>
                 </ul>
-                {% comment %} <form action="{% url 'movies:movie_search' %}" class="d-flex" role="search"> {% endcomment %}
-                    {% comment %} <input class="form-control me-2" type="search" placeholder="Поиск" aria-label="Поиск" name="s"> {% endcomment %}
-                    {% comment %} <button class="btn btn-outline-success" type="submit">Поиск</button> {% endcomment %}
-                {% comment %} </form> {% endcomment %}
-
-                <form action="{% url 'movies:movie_search' %}" method="get" class="me-5">
-                    
-                    <div class="input-group">
-                        <input class="form-control me-2" type="search" placeholder="Поиск" aria-label="Поиск" name="s">
-                        <button type="submit" class="btn btn-outline-primary">Поиск</button>
-                        <button type="button" class="btn btn-outline-primary dropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown" aria-expanded="false">
-                            <span class="visually-hidden">Переключатель выпадающий список</span>
-                        </button>
-                        <ul class="dropdown-menu dropdown-menu-end px-2">
-                            <li class="">
-                                <input class="dropdown-item btn-check" id="id_search_selection_1" value="1" name="search_selection" type="radio" >
-                                <label for="id_search_selection_1" class="btn btn-outline-primary w-100">Фильмы</label>
-                            </li>
-                            <li class="">
-                                <input class="dropdown-item btn-check" id="id_search_selection_2" value="2" name="search_selection" type="radio" >
-                                <label for="id_search_selection_2" class="btn btn-outline-primary w-100">Персоны</label>
-                            </li>
-                        </ul>
-                    </div>
+                {% with request.resolver_match.view_name as view_name %}
+                {% if view_name == 'movies:persons' or view_name == 'movies:bookmark_persons' %}
+                <form action="{% url 'movies:person_search' %}" class="d-flex" role="search">
+                    <input class="form-control me-2" type="search" placeholder="Поиск персон" aria-label="Поиск" name="s">
+                    <button class="btn btn-outline-primary" type="submit">Поиск</button>
                 </form>
+                {% else %}
+                <form action="{% url 'movies:movie_search' %}" class="d-flex" role="search">
+                    <input class="form-control me-2" type="search" placeholder="Поиск фильмов" aria-label="Поиск" name="s">
+                    <button class="btn btn-outline-primary" type="submit">Поиск</button>
+                </form>
+                {% endif %}
+                {% endwith %}
 
             </div>
         </div>

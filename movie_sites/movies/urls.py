@@ -2,10 +2,21 @@ from django.urls import path
 
 from .models import Comment, Movie, Person
 from .views import (
-    AddBookmarkView, AddComment, AddRating, BookmarkMovieListView,
-    BookmarkPersonListView, LikeDislikeView, MovieCategoriesView,
-    MovieCreateView, MovieDetailView, MovieListView, MovieSearchView,
-    PersonCreateView, PersonDetailView, PersonListView,
+    AddBookmarkView,
+    AddComment,
+    AddRating,
+    BookmarkMovieListView,
+    BookmarkPersonListView,
+    LikeDislikeView,
+    MovieCategoriesView,
+    MovieCreateView,
+    MovieDetailView,
+    MovieListView,
+    MovieSearchView,
+    PersonCreateView,
+    PersonDetailView,
+    PersonListView,
+    PersonSearchView,
 )
 
 app_name = "movies"
@@ -54,5 +65,6 @@ urlpatterns = [
         BookmarkMovieListView.as_view(),
         name="bookmark_movies",
     ),
-    path("search/", MovieSearchView.as_view(), name="movie_search"),
+    path("search/movies/", MovieSearchView.as_view(), name="movie_search"),
+    path("search/persons/", PersonSearchView.as_view(), name="person_search"),
 ]

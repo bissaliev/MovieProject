@@ -2,39 +2,31 @@ from django.contrib import messages
 from django.contrib.contenttypes.models import ContentType
 from django.db.models import Avg, Q
 from django.forms.models import inlineformset_factory
+from django.http import HttpResponse
 from django.shortcuts import redirect, render
 from django.urls import reverse_lazy
 from django.views.generic import CreateView, DetailView, ListView
 from django.views.generic.base import View
 
-from .filters import FilterOrderMovieMixin, FilterOrderPersonMixin
 from .forms import (
     CommentForm, MovieActorForm, MovieForm, PersonForm, RatingForm,
 )
+from .mixins import BaseMovieListMixin, BasePersonListMixin
 from .models import Bookmark, LikeDislike, Movie, MovieActor, Person, Rating
 from .utils import get_ip
 
 
-class MovieListView(FilterOrderMovieMixin, ListView):
+class MovieListView(BaseMovieListMixin):
     """Класс-представление для вывода списка всех фильмов с пагинацией."""
+    pass
 
-    model = Movie
-    template_name = "movies/movies.html"
-    paginate_by = 8
-    extra_context = {"title": "Фильмы"}
 
-    def get_context_data(self, **kwargs):
-        """
-        Добавляем в контекст переменные 'current_genre', 'current_countries'
-        для отображения в шаблоне выбранных опций фильтрации в предыдущем
-        запросе.
-        """
-        context = super().get_context_data(**kwargs)
-        context["current_genre"] = [
-            int(i) for i in self.request.GET.getlist("genres")]
-        context["current_countries"] = [
-            int(i) for i in self.request.GET.getlist("countries")]
-        return context
+class MovieCategoriesView(BaseMovieListMixin):
+    """Возвращает список фильмов по определенной категории."""
+
+    def get_queryset(self):
+        category_slug = self.kwargs["category_slug"]
+        return super().get_queryset().filter(category__slug=category_slug)
 
 
 class MovieDetailView(DetailView):
@@ -55,48 +47,6 @@ class MovieDetailView(DetailView):
         context["rating_form"] = RatingForm()
         context["form"] = CommentForm()
         return context
-
-
-class MovieSearchView(FilterOrderMovieMixin, ListView):
-    """Класс-представления для поиска фильма по названию."""
-
-    model = Movie
-    template_name = "movies/movies.html"
-    paginate_by = 8
-
-    def get_queryset(self):
-        search = self.request.GET.get("s")
-        if search:
-            return super().get_queryset().filter(name__icontains=search)
-        return super().get_queryset()
-
-
-class SearchView(FilterOrderMovieMixin, View):
-    def get(self, request):
-        s = request.GET.get("s")
-        search_selection = request.GET.get("search_selection")
-        if s:
-            if search_selection == 1:
-                qs = Movie.objects.filter(name__icontains=s)
-                return render(request, "movies/movies.html", {"object_list": qs})
-            qs = Person.objects.filter(
-                Q(first_name__icontains=s) | Q(last_name__icontains=s)
-            )
-            return render(request, "movies/person_list.html", {"object_list": qs})
-
-
-class PersonSearchView(ListView): # не активна
-    """класс представление для поиска персон."""
-
-    model = Person
-    template_name = "movies/person_list.html"
-    paginate_by = 8
-
-    def get_queryset(self):
-        search = self.request.GET.get("s")
-        return Person.objects.filter(
-            Q(first_name__icontains=search) | Q(last_name__icontains=search)
-        )
 
 
 class MovieCreateView(CreateView):  # добавить функционал чтобы добавлять мог только администратор
@@ -148,26 +98,31 @@ class MovieCreateView(CreateView):  # добавить функционал чт
         )
 
 
-class PersonListView(FilterOrderPersonMixin, ListView):
-    """Возвращает список персон."""
-    model = Person
-    template_name = "movies/person_list.html"
-    paginate_by = 8
-    extra_context = {"title": "Персоны"}
+class MovieSearchView(BaseMovieListMixin):  # настроить взаимодействие поиска и фильтра
+    """Класс-представления для поиска фильма по названию."""
 
-    def get_context_data(self, **kwargs):
-        """
-        Добавляем в контекст переменные 'current_profile', 'current_gender'
-        для отображения в шаблоне выбранных опций фильтрации в предыдущем
-        запросе.
-        """
-        context = super().get_context_data(**kwargs)
-        current_profile = self.request.GET.getlist("profile")
-        current_gender = self.request.GET.get("gender")
-        context["current_profile"] = current_profile
-        context["current_gender"] = current_gender
-        print(current_gender)
-        return context
+    def get_queryset(self):
+        search = self.request.GET.get("s")
+        if search:
+            return super().get_queryset().filter(name__icontains=search)
+        return super().get_queryset()
+
+
+class PersonSearchView(BasePersonListMixin):  # настроить взаимодействие поиска и фильтра
+    """Класс представление для поиска персон."""
+
+    def get_queryset(self):
+        search = self.request.GET.get("s")
+        if search:
+            return super().get_queryset().filter(
+                Q(first_name__icontains=search) | Q(last_name__icontains=search)
+            )
+        return super().get_queryset()
+
+
+class PersonListView(BasePersonListMixin):
+    """Возвращает список персон."""
+    pass
 
 
 class PersonCreateView(CreateView):
@@ -184,6 +139,42 @@ class PersonDetailView(DetailView):
     template_name = "movies/person_detail.html"
     extra_context = {"title": "Детальная информация"}
     pk_url_kwarg = "person_id"
+
+
+class BookmarkMovieListView(BaseMovieListMixin):
+    """
+    Возвращает список фильмов, находящихся в закладках у определенного
+    авторизированного пользователя.
+    """
+
+    def get_queryset(self):
+        return super().get_queryset().filter(bookmarks__user=self.request.user)
+
+
+class BookmarkPersonListView(BasePersonListMixin):
+    """
+    Возвращает список персон, находящихся в закладках у определенного
+    авторизированного пользователя.
+    """
+
+    def get_queryset(self):
+        return super().get_queryset().filter(bookmarks__user=self.request.user)
+
+
+class AddBookmarkView(View):
+    """Добавление закладки на определенный контент, а также её удаление."""
+
+    model = None
+
+    def get(self, request, pk):
+        bookmark, created = Bookmark.objects.get_or_create(
+            user=request.user,
+            content_type=ContentType.objects.get_for_model(self.model),
+            object_id=pk,
+        )
+        if not created:
+            bookmark.delete()
+        return redirect(request.META.get("HTTP_REFERER", "/"))
 
 
 class AddComment(View):
@@ -210,26 +201,17 @@ class AddRating(View):
             rating, _ = Rating.objects.update_or_create(
                 movie_id=int(request.POST.get("movie")),
                 ip=get_ip(request),
-                defaults={"score": request.POST.get("score")}
+                defaults={"score": request.POST.get("score")},
             )
-            avg_rating = rating.movie.ratings.values(
-                "movie"
-            ).annotate(avg=Avg("score"))[0].get("avg")
+            avg_rating = (
+                rating.movie.ratings.values("movie")
+                .annotate(avg=Avg("score"))[0]
+                .get("avg")
+            )
             rating.movie.rating = avg_rating
             rating.movie.save()
             return redirect("movies:movie_detail", request.POST.get("movie"))
         return HttpResponse(status=400)
-
-
-class MovieCategoriesView(FilterOrderMovieMixin, ListView):
-    """Возвращает список фильмов по определенной категории."""
-    model = Movie
-    template_name = "movies/movies.html"
-    paginate_by = 8
-
-    def get_queryset(self):
-        category_slug = self.kwargs["category_slug"]
-        return super().get_queryset().filter(category__slug=category_slug)
 
 
 class LikeDislikeView(View):
@@ -237,13 +219,11 @@ class LikeDislikeView(View):
     Создание лайков и дизлайков на определенный контент,
     а также их удаление.
     """
+
     model = None
 
     def get(self, request, pk, vote):
-        votes = {
-            "1": "like",
-            "-1": "dislike"
-        }
+        votes = {"1": "like", "-1": "dislike"}
         obj = self.model.objects.get(pk=pk)
         content_type = ContentType.objects.get_for_model(obj)
         likedislike, created = LikeDislike.objects.get_or_create(
@@ -257,46 +237,3 @@ class LikeDislikeView(View):
             likedislike.save()
             messages.success(request, f"{votes[vote]} создан")
         return redirect(request.META.get("HTTP_REFERER", "/"))
-
-
-class AddBookmarkView(View):
-    """Добавление закладки на определенный контент, а также её удаление."""
-    model = None
-
-    def get(self, request, pk):
-        bookmark, created = Bookmark.objects.get_or_create(
-            user=request.user,
-            content_type=ContentType.objects.get_for_model(self.model),
-            object_id=pk
-        )
-        if not created:
-            bookmark.delete()
-        return redirect(request.META.get("HTTP_REFERER", "/"))
-
-
-class BookmarkMovieListView(FilterOrderMovieMixin, ListView):
-    """
-    Возвращает список фильмов, находящихся в закладках у определенного
-    авторизированного пользователя.
-    """
-
-    model = Movie
-    template_name = "movies/movies.html"
-    paginate_by = 8
-
-    def get_queryset(self):
-        return super().get_queryset().filter(bookmarks__user=self.request.user)
-
-
-class BookmarkPersonListView(FilterOrderPersonMixin, ListView):
-    """
-    Возвращает список персон, находящихся в закладках у определенного
-    авторизированного пользователя.
-    """
-
-    model = Person
-    template_name = "movies/person_list.html"
-    paginate_by = 8
-
-    def get_queryset(self):
-        return super().get_queryset().filter(bookmarks__user=self.request.user)
