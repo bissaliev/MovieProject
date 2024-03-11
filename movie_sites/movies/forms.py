@@ -1,15 +1,9 @@
 import datetime as dt
 
 from django import forms
+
 from .models import (
-    Person,
-    Genre,
-    Country,
-    Movie,
-    Comment,
-    MovieActor,
-    Rating,
-    Category
+    Category, Comment, Country, Genre, Movie, MovieActor, Person, Rating,
 )
 
 year = dt.datetime.now().year
@@ -80,7 +74,7 @@ class MovieActorForm(forms.ModelForm):
 
 class RatingForm(forms.ModelForm):
     """Форма для добавление рейтинга на определенный фильм."""
-    
+
     score = forms.ChoiceField(widget=forms.Select, choices=Rating.RATING_CHOICES)
 
     class Meta:
@@ -93,7 +87,7 @@ class FilterMovieForm(forms.Form):
     Форма для отображения полей для фильтрации, сортировки и поиску фильмов.
     """
 
-    CHOICE_YEARS = [(i, i) for i in range(year, year-100, -1)]
+    CHOICE_YEARS = [(i, i) for i in range(year, year-100, -10)]
 
     SORT_CHOICES = (
         ("по заголовку", (

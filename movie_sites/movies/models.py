@@ -1,19 +1,17 @@
 import uuid
-from pathlib import Path
 
-from django.db import models
-from django.db.models import Sum
+from django.contrib.auth import get_user_model
+from django.contrib.contenttypes.fields import (
+    GenericForeignKey, GenericRelation,
+)
+from django.contrib.contenttypes.models import ContentType
 from django.core.validators import MaxValueValidator
+from django.db import models
+from django.db.models import Manager, Q, Sum
 from django.urls import reverse
 from django.utils import timezone
-from django.contrib.auth import get_user_model
-from django.contrib.contenttypes.models import ContentType
-from django.contrib.contenttypes.fields import (
-    GenericForeignKey, GenericRelation
-)
 
 from .fields import WEBPField
-
 
 User = get_user_model()
 
@@ -83,6 +81,8 @@ class Person(models.Model):
 
     @property
     def get_age(self):
+        """Получение возраста персоны."""
+
         today = timezone.now().date()
         age = today.year - self.birthdate.year
         - (
