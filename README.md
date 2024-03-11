@@ -1,4 +1,4 @@
-# BestMovie - сервис о фильмах.
+# BestMovie - сервис о фильмах :movie_camera:
 
 ## О проекте
 
