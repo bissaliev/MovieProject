@@ -26,7 +26,7 @@
                 {% get_countries as countries %}
                 {% for country in countries %}
                     <div>
-                        <input type="checkbox" name="countries" value="{{country.id}}" id="id_filter_countries_{{country.id}}" class="btn-check">
+                        <input type="checkbox" name="countries" value="{{country.id}}" id="id_filter_countries_{{country.id}}" class="btn-check" {% if country.id in current_countries %}checked{%endif%}>
                         <label for="id_filter_countries_{{country.id}}" class="btn btn-outline-primary btn-sm mb-1">{{country.name}}</label>
                     </div>
                 {% endfor %}

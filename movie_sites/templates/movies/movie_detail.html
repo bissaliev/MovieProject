@@ -94,7 +94,7 @@
 
                                 <li class="mb-2">
                                     <div class="">
-                                        <p><span class="btn btn-primary btn-lg">Рейтинг <span class="badge bg-dark">{{object.rating}}</span></span></p>
+                                        <p><span class="btn btn-primary btn-lg"><img style="width: 30px; height: 30px;" src="{% static 'img/fas_fa-star.svg' %}" alt="За стеклом"> <span class="badge bg-dark">{{object.rating}}</span></span></p>
                                         {% your_rating request object as is_ip %}  <!--Определяем какой рейтинг был поставлен пользователем раннее-->
                                         <form action="{% url 'movies:add_rating' %}" method="post" name="rating">
                                             {% csrf_token %}

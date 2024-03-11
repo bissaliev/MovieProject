@@ -1,49 +1,33 @@
+<!-- Карточка фильма -->
+
 {% load thumbnail %}
 {% load movie_tag %}
 {% load static %}
-<div class="row row-cols-1 row-cols-md-3 row-cols-lg-4 g-4 g-lg-4 ">
-
-    {% for movie in object_list %}
-
-    <div class="col">
-
-        <div class="card card_movie h-100">
-
-            {% if movie.poster %}
-                {% thumbnail movie.poster "390x450" crop="center" as poster %}
-                    <img src="{{poster.url}}"alt="" width="{{poster.width}}" height="{{poster.height}}" class="card-img-top" alt="...">
-                {% endthumbnail %}
-            {% else %}
-                <img src="{% static 'img/Philosopher.jpg' %}" width="600" height="900" class="img-fluid rounded-start" alt="Постер">
-            {% endif %}
-
-            <div class="card-body">
-                
-                <h5 class="card-title"><a href="{{movie.get_absolute_url}}">{{movie.name}}({{movie.release_year}})</a></h5>
-
-                <div class="d-flex justify-content-between">
-
-                    <div class="btn btn-primary">Рейтинг: <span class="badge bg-secondary">{{ movie.rating|floatformat:"0" }}</span></div>
-
-                    {% if user.is_authenticated %}
-                        {% bookmark_is_exists movie user as bookmark %} <!--Определяет находится ли фильм в избранных-->
-                        <a class="btn btn-primary" href="{% url 'movies:add_bookmark_movie' movie.id %}">
-                            {% if bookmark %}
-                                <img style="width: 20px; height: 20px;" src="{% static 'img/bookmark_is.svg' %}" alt="За стеклом">
-                            {% else %}
-                                <img style="width: 20px; height: 20px;" src="{% static 'img/bookmark_not.svg' %}" alt="За стеклом">
-                            {% endif%}
-                        </a>
-                    {% endif %}
-
-                </div>
-
-            </div> <!--card-body-->
-
-        </div> <!-- card -->
-
-    </div>
-
-    {% endfor %}
-
+<div class="col">
+    <div class="card card_movie h-100">
+        {% if object.poster %}
+            {% thumbnail object.poster "390x450" crop="center" as poster %}
+                <img src="{{poster.url}}"alt="" width="{{poster.width}}" height="{{poster.height}}" class="card-img-top" alt="...">
+            {% endthumbnail %}
+        {% else %}
+            <img src="{% static 'img/Philosopher.jpg' %}" width="600" height="900" class="img-fluid rounded-start" alt="Постер">
+        {% endif %}
+        <div class="card-body">
+            
+            <h5 class="card-title"><a href="{{object.get_absolute_url}}">{{object.name}}({{object.release_year}})</a></h5>
+            <div class="d-flex justify-content-between">
+                <div class="btn btn-primary"><img style="width: 20px; height: 20px;" src="{% static 'img/fas_fa-star.svg' %}" alt="За стеклом"> <span class="badge bg-secondary">{{ object.rating|floatformat:"0" }}</span></div>
+                {% if user.is_authenticated %}
+                    {% bookmark_is_exists object user as bookmark %} <!--Определяет находится ли фильм в избранных-->
+                    <a class="btn btn-primary" href="{% url 'movies:add_bookmark_movie' object.id %}">
+                        {% if bookmark %}
+                            <img style="width: 20px; height: 20px;" src="{% static 'img/bookmark_is.svg' %}" alt="За стеклом">
+                        {% else %}
+                            <img style="width: 20px; height: 20px;" src="{% static 'img/bookmark_not.svg' %}" alt="За стеклом">
+                        {% endif%}
+                    </a>
+                {% endif %}
+            </div>
+        </div> <!--card-body-->
+    </div> <!-- card -->
 </div>

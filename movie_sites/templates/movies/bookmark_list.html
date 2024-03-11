@@ -1,18 +1,14 @@
 {% extends 'base.html' %}
-{% load movie_tag %}
-{% block title %}{{title}}{% endblock title %}
 {% block content %}
-        <section class="ab-info-main py-md-5 py-4 editContent" style="padding-left: 3rem; padding-right: 3rem;">
-            <div class="container-fluid py-md-3">
-                <div class="row">
-                    {% include 'movies/includes/sidebar_bookmarks.html' %}
-                    <div class="left-ads-display col-lg-9">
-                        <div class="row">
-                            {% include 'movies/includes/bookmark_objects.html' %}
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-</body>
+    <div class="container-fluid">
+        <ul class="nav nav-pills nav-fill">
+            <li class="nav-item">
+                <a class="nav-link active" aria-current="page" href="{% url 'movies:bookmark_movies' %}">Фильмы</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'movies:bookmark_persons' %}">Персоны</a>
+            </li>
+        </ul>
+    </div>
+        {% include 'movies/includes/movie_objects.html' %}
 {% endblock %}

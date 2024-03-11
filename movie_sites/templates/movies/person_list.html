@@ -1,28 +1,4 @@
-{% extends 'base.html' %}
-{% load static %}
-{% load movie_tag %}
-{% block title %}{{title}}{% endblock title %}
-{% block content %}
-    <section class="mt-5 m-lg-5">
-        <div class="container-fluid py-md-3">
-            <button class="btn btn-primary mb-2" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasMovie" aria-controls="offcanvasMovie">
-                Фильтрация
-            </button>
-
-            <div class="offcanvas offcanvas-start" tabindex="-1" id="offcanvasMovie" aria-labelledby="offcanvasMovieLabel">
-                <div class="offcanvas-header">
-                    <h5 class="offcanvas-title" id="offcanvasMovieLabel">Фильтрация</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
-                </div>
-                <div class="offcanvas-body">
-                    {% include 'movies/includes/sidebar_persons.html' %}
-                </div>
-            </div>
-
-            <div>{% include 'movies/includes/person_objects.html' %}</div>
-
-            <div>{% include 'includes/paginator.html' %}</div>
-
-        </div>
-    </section>
-{% endblock %}
+<!-- Шаблон для отображения страницы со списком актеров и режиссеров -->
+{% extends 'movies/base.html' %}
+{% block sidebar %}{% include 'movies/includes/sidebar_persons.html' %}{% endblock %}
+{% block object_list %}{% include 'movies/includes/person_objects.html' %}{% endblock %}
