@@ -20,12 +20,25 @@ class FilterBaseMixin(ABC):
         """
         pass
 
-    def get_context_data(self, **kwargs):
-        """Добавляем в контекст форму для фильтрации объектов."""
+    @abstractclassmethod
+    def get_mixin_context_data(self, **kwargs):
+        """
+        Метод который нужно определить в дочерних классах для построения
+        логики фильтрации объектов. Метод должен возвращать словарь который
+        должен быть включен в контекст.
+        """
+        pass
 
-        context = super().get_context_data(**kwargs)
+    def get_context_data(self, **kwargs):
+        """
+        Добавляем в контекст форму для фильтрации объектов и словарь,
+        который является результатов метода 'get_mixin_context_data'.
+        """
+        context = {}
         context["filter_form"] = self.filter_form(self.request.GET)
-        return context
+        context.update(self.get_mixin_context_data())
+        context.update(kwargs)
+        return super().get_context_data(**context)
 
     def get_queryset(self):
         """Возвращаем окончательный QuerySet."""
@@ -55,7 +68,8 @@ class FilterOrderPersonMixin(FilterBaseMixin):
         gender = self.request.GET.get("gender")
         if search:
             qs = qs.filter(
-                Q(first_name__icontains=search) | Q(last_name__icontains=search)
+                Q(first_name__icontains=search) |
+                Q(last_name__icontains=search)
             )
         if profile:
             if profile == "actors":
@@ -65,6 +79,19 @@ class FilterOrderPersonMixin(FilterBaseMixin):
         if gender:
             qs = qs.filter(gender=gender)
         return qs
+
+    def get_mixin_context_data(self, **kwargs):
+        """
+        Добавляем в контекст переменные 'current_profile', 'current_gender'
+        для отображения в шаблоне выбранных опций фильтрации в предыдущем
+        запросе.
+        """
+        context = {}
+        current_profile = self.request.GET.getlist("profile")
+        current_gender = self.request.GET.get("gender")
+        context["current_profile"] = current_profile
+        context["current_gender"] = current_gender
+        return context
 
 
 class FilterOrderMovieMixin(FilterBaseMixin):
@@ -97,3 +124,18 @@ class FilterOrderMovieMixin(FilterBaseMixin):
         if start_year and end_year:
             qs = qs.filter(release_year__range=(start_year, end_year))
         return qs
+
+    def get_mixin_context_data(self, **kwargs):
+        """
+        Добавляем в контекст переменные 'current_genre', 'current_countries'
+        для отображения в шаблоне выбранных опций фильтрации в предыдущем
+        запросе.
+        """
+        context = {}
+        context["current_genre"] = [
+            int(i) for i in self.request.GET.getlist("genres")
+        ]
+        context["current_countries"] = [
+            int(i) for i in self.request.GET.getlist("countries")
+        ]
+        return context
