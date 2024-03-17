@@ -1,7 +1,10 @@
 """Пользовательские теги."""
 
 from django import template
-from ..models import Category, Movie, ContentType, LikeDislike, Bookmark, Genre, Country
+
+from ..models import (
+    Bookmark, Category, ContentType, Country, Genre, LikeDislike, Movie,
+)
 from ..utils import get_ip
 
 register = template.Library()
@@ -9,18 +12,16 @@ register = template.Library()
 
 @register.simple_tag()
 def your_rating(request, object):
-    """Оперделяет ставил ли пользователь оценку фильму."""
+    """Определяет ставил ли пользователь оценку фильму."""
 
-    rating = object.ratings.filter(ip=get_ip(request))
-    if rating:
+    if rating := object.ratings.filter(ip=get_ip(request)):
         return rating[0].score
 
+
 @register.filter()
-def get_range(value):
-    """
-    Фильтр возвращает последовательность чисел для вывода их в шаблоне.
-    """
-    return range(1, value)
+def convert_to_number(value):
+    """Фильтр конвертирует значение в тип данных int."""
+    return int(value)
 
 
 @register.simple_tag()

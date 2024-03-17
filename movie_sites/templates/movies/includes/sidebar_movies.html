@@ -43,12 +43,15 @@
 
         <div class="input-group mb-3">
             <label for="id_rating">Рейтинг</label>
-            <div id="id_rating" class="btn-group" role="group" aria-label="рейтинг">
-                {% for rating in 11|get_range %}
-                    <input type="radio" class="btn-check" value="{{rating}}" name="rating" id="id_rating_{{rating}}">
-                    <label class="btn btn-outline-primary" for="id_rating_{{rating}}">{{rating}}</label>
+
+            <div class="btn-group mb-3">
+                {% for choice in filter_form.rating.field.choices %}
+                    <input class="btn-check" name='{{ filter_form.rating.name }}' id='{{ filter_form.rating.auto_id }}_{{ forloop.counter0 }}' type='radio' value='{{ choice.0 }}'
+                    {% if choice.0 == filter_form.rating.data|convert_to_number %} checked {% endif %}
+                    />
+                    <label for='{{ filter_form.rating.auto_id }}_{{ forloop.counter0 }}' class="btn btn-outline-primary">{{ choice.1 }}</label>
                 {% endfor %}
-            </div>
+            </div> <!-- rating -->
         </div>
 
     </div>

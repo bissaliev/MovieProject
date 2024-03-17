@@ -34,10 +34,12 @@ class FilterBaseMixin(ABC):
         Добавляем в контекст форму для фильтрации объектов и словарь,
         который является результатов метода 'get_mixin_context_data'.
         """
-        context = {}
-        context["filter_form"] = self.filter_form(self.request.GET)
-        context.update(self.get_mixin_context_data())
-        context.update(kwargs)
+        print(self.request.GET)
+        context = {
+            "filter_form": self.filter_form(self.request.GET)
+        }
+        context |= self.get_mixin_context_data()
+        context |= kwargs
         return super().get_context_data(**context)
 
     def get_queryset(self):
@@ -86,12 +88,10 @@ class FilterOrderPersonMixin(FilterBaseMixin):
         для отображения в шаблоне выбранных опций фильтрации в предыдущем
         запросе.
         """
-        context = {}
-        current_profile = self.request.GET.getlist("profile")
-        current_gender = self.request.GET.get("gender")
-        context["current_profile"] = current_profile
-        context["current_gender"] = current_gender
-        return context
+        return {
+            "current_profile": self.request.GET.getlist("profile"),
+            "current_gender": self.request.GET.get("gender"),
+        }
 
 
 class FilterOrderMovieMixin(FilterBaseMixin):

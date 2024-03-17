@@ -82,14 +82,13 @@ class Person(models.Model):
     @property
     def get_age(self):
         """Получение возраста персоны."""
-
         today = timezone.now().date()
-        age = today.year - self.birthdate.year
-        - (
-            (today.month, today.day)
-            < (self.birthdate.month, self.birthdate.day)
+        return (
+            today.year - self.birthdate.year - (
+                (today.month, today.day) <
+                (self.birthdate.month, self.birthdate.day)
+            )
         )
-        return age
 
     def get_like_count(self):
         return self.votes.filter(vote__gt=0).count()

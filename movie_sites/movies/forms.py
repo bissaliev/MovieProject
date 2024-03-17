@@ -73,9 +73,10 @@ class MovieActorForm(forms.ModelForm):
 
 
 class RatingForm(forms.ModelForm):
-    """Форма для добавление рейтинга на определенный фильм."""
+    """Форма для присвоение рейтинга на определенный фильм пользователем."""
 
-    score = forms.ChoiceField(widget=forms.Select, choices=Rating.RATING_CHOICES)
+    score = forms.ChoiceField(
+        widget=forms.widgets.Select, choices=Rating.RATING_CHOICES)
 
     class Meta:
         model = Rating
@@ -109,8 +110,8 @@ class FilterMovieForm(forms.Form):
         label="Сортировать по:",
         required=False,
     )
-    rating = forms.MultipleChoiceField(
-        choices=Rating.RATING_CHOICES, widget=forms.CheckboxSelectMultiple,
+    rating = forms.ChoiceField(
+        choices=Rating.RATING_CHOICES, widget=forms.Select,
         label="Рейтинг"
     )
     start_year = forms.ChoiceField(choices=reversed(CHOICE_YEARS))
